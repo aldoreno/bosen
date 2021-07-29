@@ -1,11 +1,12 @@
 package user
 
 import (
+	"bosen/model"
 	"database/sql"
 	"fmt"
-	"github.com/killedbymemory/bosen/backend/model"
-	"github.com/satori/go.uuid"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserRepository struct {
@@ -107,7 +108,7 @@ func (repository *UserRepository) FindByUsername(username string) (*model.User, 
 }
 
 func (repository *UserRepository) FindAll() ([]model.User, error) {
-	rows, err := repository.GetDatabase().Query("SELECT uid, username, firstName, middleName, lastName FROM userinfo")
+	rows, err := repository.GetDatabase().Query("SELECT uid, username, firstname, middlename, lastname FROM userinfo")
 
 	if err != nil {
 		return nil, err

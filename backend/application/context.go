@@ -1,9 +1,10 @@
 package application
 
 import (
+	"bosen/session"
+	"bosen/user"
 	"database/sql"
-	"github.com/killedbymemory/bosen/backend/session"
-	"github.com/killedbymemory/bosen/backend/user"
+
 	"github.com/labstack/echo"
 )
 

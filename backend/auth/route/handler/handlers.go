@@ -1,14 +1,15 @@
 package handler
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"github.com/killedbymemory/bosen/backend/application"
-	AuthHelper "github.com/killedbymemory/bosen/backend/auth/helper"
-	"github.com/killedbymemory/bosen/backend/model"
-	"github.com/labstack/echo"
-	"github.com/satori/go.uuid"
+	"bosen/application"
+	AuthHelper "bosen/auth/helper"
+	"bosen/model"
 	"net/http"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/labstack/echo"
+	uuid "github.com/satori/go.uuid"
 )
 
 func AuthenticateSession(context echo.Context) error {

@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"github.com/killedbymemory/bosen/backend/application"
-	"github.com/killedbymemory/bosen/backend/model"
-	"github.com/labstack/echo"
-	"github.com/satori/go.uuid"
+	"bosen/application"
+	"bosen/model"
 	"net/http"
+
+	"github.com/labstack/echo"
+	uuid "github.com/satori/go.uuid"
 )
 
 func GetSessionInfo(context echo.Context) error {

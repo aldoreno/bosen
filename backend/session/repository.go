@@ -1,11 +1,12 @@
 package session
 
 import (
+	"bosen/model"
 	"database/sql"
 	"fmt"
-	"github.com/killedbymemory/bosen/backend/model"
-	"github.com/satori/go.uuid"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type SessionRepository struct {
