@@ -3,12 +3,13 @@ package handler
 import (
 	"net/http"
 
+	"bosen/application"
+	AuthHelper "bosen/auth/helper"
+	"bosen/model"
 	"fmt"
-	"github.com/killedbymemory/bosen/backend/application"
-	AuthHelper "github.com/killedbymemory/bosen/backend/auth/helper"
-	"github.com/killedbymemory/bosen/backend/model"
+
 	"github.com/labstack/echo"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 func GetUserInfo(context echo.Context) error {
