@@ -1,0 +1,10 @@
+*/Makefile
+*/README.md
+*/coverage*
+*/.idea*
+*/docker-compose.yml
+*/Dockerfile*
+*/.env*
+*.png
+*/bin
+*/frontend
