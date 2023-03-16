@@ -2,9 +2,13 @@ package routes
 
 import (
 	AuthRouteHandler "bosen/auth/route/handler"
+	"bosen/manifest"
 	"bosen/model"
 	SessionRouteHandler "bosen/session/route/handler"
 	UserRouteHandler "bosen/user/route/handler"
+	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 type RouteGroup struct{}
@@ -13,6 +17,13 @@ var API = RouteGroup{}
 
 func (r RouteGroup) RegisterRoutes(fn func(model.Routes)) {
 	routes := model.Routes{
+		"inspect": model.Route{
+			Method: "GET",
+			Path:   "/inspect",
+			Handler: func(context echo.Context) error {
+				return context.JSON(http.StatusOK, manifest.Info())
+			},
+		},
 		"get-users": model.Route{
 			Method:  "GET",
 			Path:    "/users",
