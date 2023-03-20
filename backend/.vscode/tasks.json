@@ -16,15 +16,14 @@
 		},
 		{
 			"type": "shell",
-			"label": "go: run main.go",
-			"command": "go run main.go",
-			"args": [
-			],
+			"label": "go: make run",
+			"command": "make run",
+			"args": [],
 			"problemMatcher": [
 				"$go"
 			],
 			"group": "build",
-			"detail": "cd /home/leonardo/Projects/bosen/backend; go run main.go"
+			"detail": "cd /home/leonardo/Projects/bosen/backend; make run"
 		}
 	]
 }

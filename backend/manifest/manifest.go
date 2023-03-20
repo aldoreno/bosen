@@ -1,12 +1,15 @@
 package manifest
 
+// Following fields are automatically fields on build time "-ldflags".
+var AppName string
 var AppVersion string
 var BuildTime string
 var CommitMsg string
 var CommitHash string
 var ReleaseVersion string
 
-type Manifest struct {
+type manifest struct {
+	AppName        string
 	AppVersion     string
 	BuildTime      string
 	CommitMsg      string
@@ -14,8 +17,9 @@ type Manifest struct {
 	ReleaseVersion string
 }
 
-func Info() Manifest {
-	return Manifest{
+func Info() manifest {
+	return manifest{
+		AppName,
 		AppVersion,
 		BuildTime,
 		CommitMsg,

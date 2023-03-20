@@ -1,17 +1,18 @@
-APP_NAME:=bosen-backend
-ENTRYPOINT?=./main.go
-
-PWD:=$(shell pwd -L)
-DOCKER_RUN:=docker run --rm -it -w /app -v ${PWD}:/app -v ${GOPATH}/pkg/mod/cache:/go/pkg/mod/cache golang:1.20-buster
-
 COMMIT_TAG:=$(shell git describe --tags --abbrev=0 2> /dev/null || echo "no tag")
 COMMIT_HASH:=$(shell git rev-parse --short HEAD)
 COMMIT_MSG:=$(shell git log -1 --pretty=format:"%s")
 BUILD_TIME:=$(shell date)
 
+APP_NAME:=bosen-backend
+APP_VERSION:=${COMMIT_HASH}
+ENTRYPOINT?=./main.go
+
 IMAGE_REGISTRY:=docker.io/aldoreno
 IMAGE_NAME:=$(IMAGE_REGISTRY)/$(APP_NAME)
-IMAGE_TAG:=$(IMAGE_NAME):$(COMMIT_HASH)
+IMAGE_TAG:=$(COMMIT_HASH)
+
+PWD:=$(shell pwd -L)
+DOCKER_RUN:=docker run --rm -it -w /app -v ${PWD}:/app -v ${GOPATH}/pkg/mod/cache:/go/pkg/mod/cache golang:1.20-buster
 
 BUILD_TAG?=development
 
@@ -37,8 +38,10 @@ build: clean ## Build golang project
 	@echo "Compiling ..."
 	CGO_ENABLED=1 go build \
 		-v -race \
+		-tags jsoniter
 		-ldflags="\
-			-X \"bosen/manifest.AppVersion=$(COMMIT_TAG)\" \
+			-X \"bosen/manifest.AppName=$(APP_NAME)\" \
+			-X \"bosen/manifest.AppVersion=$(APP_VERSION)\" \
 			-X \"bosen/manifest.BuildTime=$(BUILD_TIME)\" \
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
@@ -47,7 +50,16 @@ build: clean ## Build golang project
 
 .PHONY: run
 run: ## Run golang project
-	go run main.go
+	go run \
+		-tags=jsoniter \
+		-ldflags="\
+			-X \"bosen/manifest.AppName=$(APP_NAME)\" \
+			-X \"bosen/manifest.AppVersion=$(APP_VERSION)\" \
+			-X \"bosen/manifest.BuildTime=$(BUILD_TIME)\" \
+			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
+			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
+			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
+		main.go
 
 .PHONY: test-local
 test-local: ## Run local golang tests
@@ -107,25 +119,25 @@ logs: ## View container log
 
 .PHONY: docker-clean
 docker-clean: ## Clean docker removes image
-	docker rmi $(IMAGE_TAG)
+	docker rmi $(IMAGE_NAME):$(IMAGE_TAG)
 
 .PHONY: docker-build
 docker-build: ## Build docker image for the project
-	@echo "Building image \"$(IMAGE_TAG)\" ..."
+	@echo "Building image \"$(IMAGE_NAME):$(IMAGE_TAG)\" ..."
 	@docker build \
 		--build-arg BUILDKIT_CONTEXT_KEEP_GIT_DIR=1 \
 		--target production \
-		--tag $(IMAGE_TAG) \
+		--tag $(IMAGE_NAME):$(IMAGE_TAG) \
 		-f Dockerfile \
 		..
 
 .PHONY: docker-run
-docker-run: ## docker-deps ## Run docker container for image project
+docker-run: docker-deps ## Run docker container for image project
 	docker run \
 		--rm \
 		-it \
 		-e APP_NAME=$(APP_NAME) \
-		-e APP_VERSION=$(COMMIT_HASH) \
+		-e APP_VERSION=$(APP_VERSION) \
 		-p 8080:8080 \
 		--env-file .env \
 		--network bridge \
@@ -133,5 +145,5 @@ docker-run: ## docker-deps ## Run docker container for image project
 		$(IMAGE_TAG)
 
 docker-deps:
-	docker-compose up -d postgres mongodb-primary mongodb-secondary mongodb-arbiter
-	sleep 3
+	# docker-compose up -d postgres mongodb-primary mongodb-secondary mongodb-arbiter
+	# sleep 3
