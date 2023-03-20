@@ -6,11 +6,26 @@ import (
 	"bosen/model"
 	"bosen/routes"
 
+	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"go.uber.org/zap"
 )
 
 func main() {
+	builder := application.NewBuilder()
+
+	builder.Services.AddDbConfig(func(cfg *application.DbConfig) {
+		err := envconfig.Process("BACKEND_DB", cfg)
+		if err != nil {
+			zap.S().Fatal(err.Error())
+		}
+		zap.S().Infof("%+v", cfg)
+	})
+
+	app := builder.Build()
+	app.Start()
+
 	e := echo.New()
 
 	const (

@@ -1,20 +1,27 @@
 module bosen
 
-go 1.16
+go 1.20
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo v3.3.5+incompatible
-	github.com/labstack/gommon v0.2.2-0.20180426014445-588f4e8bddc6 // indirect
 	github.com/lib/pq v0.0.0-20180327071824-d34b9ff171c2
+	github.com/satori/go.uuid v1.2.1-0.20180103174451-36e9d2ebbde5
+	go.uber.org/zap v1.24.0
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+)
+
+require (
+	github.com/labstack/gommon v0.2.2-0.20180426014445-588f4e8bddc6 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
-	github.com/satori/go.uuid v1.2.1-0.20180103174451-36e9d2ebbde5
-	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
-	golang.org/x/net v0.0.0-20190620200207-3b0461eec859 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
+	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3 // indirect
+	golang.org/x/sys v0.0.0-20200116001909-b77594299b42 // indirect
+	golang.org/x/text v0.3.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )

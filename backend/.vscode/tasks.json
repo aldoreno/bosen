@@ -1,0 +1,30 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "go",
+			"label": "go: build package",
+			"command": "build",
+			"args": [
+				"${fileDirname}"
+			],
+			"problemMatcher": [
+				"$go"
+			],
+			"group": "build",
+			"detail": "cd /home/leonardo/Projects/bosen/backend; go build ${fileDirname}"
+		},
+		{
+			"type": "shell",
+			"label": "go: run main.go",
+			"command": "go run main.go",
+			"args": [
+			],
+			"problemMatcher": [
+				"$go"
+			],
+			"group": "build",
+			"detail": "cd /home/leonardo/Projects/bosen/backend; go run main.go"
+		}
+	]
+}

@@ -1,7 +1,6 @@
-ENVIRONMENT=development
-SYSTEM=bosen-backend
-SYSTEM_VERSION:=$(shell git branch --show-current | cut -d '/' -f1) # docker img tag candidate
+APP_NAME:=bosen-backend
 ENTRYPOINT?=./main.go
+
 PWD:=$(shell pwd -L)
 DOCKER_RUN:=docker run --rm -it -w /app -v ${PWD}:/app -v ${GOPATH}/pkg/mod/cache:/go/pkg/mod/cache golang:1.20-buster
 
@@ -9,8 +8,11 @@ COMMIT_TAG:=$(shell git describe --tags --abbrev=0 2> /dev/null || echo "no tag"
 COMMIT_HASH:=$(shell git rev-parse --short HEAD)
 COMMIT_MSG:=$(shell git log -1 --pretty=format:"%s")
 BUILD_TIME:=$(shell date)
-DOCKER_IMAGE_TAG?=docker.io/aldoreno/${SYSTEM}
-DOCKER_IMAGE_TAG_VERSION?=${DOCKER_IMAGE_TAG}:${COMMIT_HASH}
+
+IMAGE_REGISTRY:=docker.io/aldoreno
+IMAGE_NAME:=$(IMAGE_REGISTRY)/$(APP_NAME)
+IMAGE_TAG:=$(IMAGE_NAME):$(COMMIT_HASH)
+
 BUILD_TAG?=development
 
 .PHONY: all
@@ -24,11 +26,11 @@ help: ## Display help screen
 
 .PHONY: test
 init: ## Create environment variables
-	cp .env.example .env
+	cp .env.example .envrc
 
 .PHONY: clean
 clean: ## Clean build bin/
-	@rm -rf bin/$(SYSTEM)
+	@rm -rf bin/$(APP_NAME)
 
 .PHONY: build
 build: clean ## Build golang project
@@ -41,7 +43,7 @@ build: clean ## Build golang project
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
-		-o bin/$(SYSTEM) $(ENTRYPOINT)
+		-o bin/$(APP_NAME) $(ENTRYPOINT)
 
 .PHONY: run
 run: ## Run golang project
@@ -105,15 +107,15 @@ logs: ## View container log
 
 .PHONY: docker-clean
 docker-clean: ## Clean docker removes image
-	docker rmi $(DOCKER_IMAGE_TAG_VERSION)
+	docker rmi $(IMAGE_TAG)
 
 .PHONY: docker-build
 docker-build: ## Build docker image for the project
-	@echo "Building image \"$(DOCKER_IMAGE_TAG_VERSION)\" ..."
+	@echo "Building image \"$(IMAGE_TAG)\" ..."
 	@docker build \
 		--build-arg BUILDKIT_CONTEXT_KEEP_GIT_DIR=1 \
 		--target production \
-		--tag $(DOCKER_IMAGE_TAG_VERSION) \
+		--tag $(IMAGE_TAG) \
 		-f Dockerfile \
 		..
 
@@ -122,14 +124,13 @@ docker-run: ## docker-deps ## Run docker container for image project
 	docker run \
 		--rm \
 		-it \
-		-e ENVIRONMENT=$(ENVIRONMENT) \
-		-e SYSTEM=$(SYSTEM) \
-		-e SYSTEM_VERSION=$(SYSTEM_VERSION) \
+		-e APP_NAME=$(APP_NAME) \
+		-e APP_VERSION=$(COMMIT_HASH) \
 		-p 8080:8080 \
 		--env-file .env \
 		--network bridge \
-		--name $(SYSTEM) \
-		$(DOCKER_IMAGE_TAG_VERSION)
+		--name $(APP_NAME) \
+		$(IMAGE_TAG)
 
 docker-deps:
 	docker-compose up -d postgres mongodb-primary mongodb-secondary mongodb-arbiter
