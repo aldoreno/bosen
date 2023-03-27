@@ -1,34 +1,36 @@
 package application
 
 import (
+	"context"
 	"log"
 
 	"go.uber.org/zap"
 )
 
+type Process interface {
+	Start(context.Context)
+	Stop(context.Context)
+}
+
+// Application is a container that wraps required components
 type Application struct {
-	serviceProvider map[string]interface{}
+	config Config
+}
+
+func ProviderApplication(config Config) *Application {
+	return &Application{config}
 }
 
 type Option func(*Application)
 
-func NewApplication(opts ...Option) *Application {
-	app := &Application{
-		serviceProvider: make(map[string]interface{}, 0),
-	}
+func NewApplicationx(opts ...Option) *Application {
+	app := &Application{}
 
 	for _, opt := range opts {
 		opt(app)
 	}
 
 	return app
-}
-
-func WithDatabase(resolver func() *DbConfig) Option {
-	return func(a *Application) {
-		a.serviceProvider["db_config"] = resolver()
-		zap.S().Info("db configuration(s) set")
-	}
 }
 
 // NOTE: logger should be configured the earliest
@@ -43,13 +45,19 @@ func WithLogger() Option {
 	}
 }
 
-func (a *Application) Start() error {
+func (a *Application) AddResource(_ any) *Application {
+	return a
+}
+
+func (a *Application) Start(ctx context.Context) error {
 	zap.L().Info("app starting ...")
+
 	zap.L().Info("app started")
 	return nil
 }
 
-func (a *Application) Stop() {
+func (a *Application) Stop(ctx context.Context) {
 	zap.L().Info("app stopping ...")
+
 	zap.L().Info("app stopped")
 }

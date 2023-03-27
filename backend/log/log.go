@@ -42,3 +42,11 @@ func Printf(format string, v ...interface{}) {
 func Info(msg string, fields ...zapcore.Field) {
 	zap.L().Info(msg, fields...)
 }
+
+func Infof(template string, args ...interface{}) {
+	zap.S().Infof(template, args...)
+}
+
+func Fatal(v ...interface{}) {
+	zap.S().Fatal(v...)
+}

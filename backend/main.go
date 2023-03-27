@@ -3,28 +3,22 @@ package main
 import (
 	"bosen/application"
 	"bosen/database"
+	"bosen/log"
 	"bosen/model"
 	"bosen/routes"
+	"context"
 
-	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"go.uber.org/zap"
 )
 
 func main() {
-	builder := application.NewBuilder()
+	app, err := application.NewApplication()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	builder.Services.AddDbConfig(func(cfg *application.DbConfig) {
-		err := envconfig.Process("BACKEND_DB", cfg)
-		if err != nil {
-			zap.S().Fatal(err.Error())
-		}
-		zap.S().Infof("%+v", cfg)
-	})
-
-	app := builder.Build()
-	app.Start()
+	app.Start(context.Background())
 
 	e := echo.New()
 
