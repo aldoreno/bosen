@@ -8,7 +8,7 @@ var CommitMsg string
 var CommitHash string
 var ReleaseVersion string
 
-type manifest struct {
+type Manifest struct {
 	AppName        string
 	AppVersion     string
 	BuildTime      string
@@ -17,8 +17,8 @@ type manifest struct {
 	ReleaseVersion string
 }
 
-func Info() manifest {
-	return manifest{
+func Info() Manifest {
+	return Manifest{
 		AppName,
 		AppVersion,
 		BuildTime,

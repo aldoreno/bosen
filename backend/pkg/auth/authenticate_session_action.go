@@ -19,7 +19,7 @@ func NewAuthSessAction(svc *AuthService) *AuthenticateSessionAction {
 	return &AuthenticateSessionAction{svc}
 }
 
-func (a AuthenticateSessionAction) AuthenticateSession(req *restful.Request, res *restful.Response) {
+func (a AuthenticateSessionAction) Handler(req *restful.Request, res *restful.Response) {
 	var (
 		err         error
 		credentials AuthenticateSessionInput

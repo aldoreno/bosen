@@ -2,86 +2,85 @@ package main
 
 import (
 	"bosen/application"
-	"bosen/database"
 	"bosen/log"
-	"bosen/model"
-	"bosen/routes"
 	"context"
-
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	stdlog "log"
 )
 
 func main() {
-	app, err := application.NewApplication()
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.InitGlobalLogger()
 
-	app.Start(context.Background())
-
-	e := echo.New()
-
-	const (
-		DB_USER     = "cmsuser"
-		DB_PASSWORD = "password"
-		DB_NAME     = "cms"
-		DB_HOST     = "localhost"
-		DB_PORT     = 5432
+	app := application.NewApplication(
+		application.WithConfig(InjectConfig()),
+		application.WithContainer(InjectContainer()),
+		application.WithResource(InjectDiagnosticResource()),
+		application.WithResource(InjectAuthResource()),
 	)
 
-	if _, err := database.NewDBConnection("postgres", DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME); err != nil {
-		panic(err)
-	}
+	stdlog.Fatal(app.Start(context.Background()))
 
-	db := database.GetDBConnection("postgres")
-	defer db.Close()
+	// e := echo.New()
 
-	// Allow requests from any origin
-	// See: https://github.com/labstack/echox/blob/master/cookbook/cors/server.go
-	e.Use(middleware.CORS())
+	// const (
+	// 	DB_USER     = "cmsuser"
+	// 	DB_PASSWORD = "password"
+	// 	DB_NAME     = "cms"
+	// 	DB_HOST     = "localhost"
+	// 	DB_PORT     = 5432
+	// )
 
-	e.Use(func(handler echo.HandlerFunc) echo.HandlerFunc {
-		return func(context echo.Context) error {
-			appContext := application.NewApplicationContext(context, db)
-			return handler(appContext)
-		}
-	})
+	// if _, err := database.NewDBConnection("postgres", DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME); err != nil {
+	// 	panic(err)
+	// }
 
-	secret := []byte("seqCEeCMUK8cd4RjMaARwqf8XnuZqkL567FysqRvZJyMTkM3H9uztKtykqtSJkqVNFhnERva")
-	JWTMiddleware := middleware.JWT(secret)
+	// db := database.GetDBConnection("postgres")
+	// defer db.Close()
 
-	routes.API.RegisterRoutes(func(routes model.Routes) {
-		for routeName, route := range routes {
-			if route.Restricted {
-				// Restricted route reference implementation (minus echo.Group)
-				// See: https://github.com/labstack/echox/blob/master/cookbook/jwt/map-claims/server.go#L43
-				switch route.Method {
-				case "GET":
-					e.GET(route.Path, route.Handler, JWTMiddleware).Name = routeName
-				case "POST":
-					e.POST(route.Path, route.Handler, JWTMiddleware).Name = routeName
-				case "PUT":
-					e.PUT(route.Path, route.Handler, JWTMiddleware).Name = routeName
-				case "DELETE":
-					e.DELETE(route.Path, route.Handler, JWTMiddleware).Name = routeName
-				}
+	// // Allow requests from any origin
+	// // See: https://github.com/labstack/echox/blob/master/cookbook/cors/server.go
+	// e.Use(middleware.CORS())
 
-				continue
-			}
+	// e.Use(func(handler echo.HandlerFunc) echo.HandlerFunc {
+	// 	return func(context echo.Context) error {
+	// 		appContext := application.NewApplicationContext(context, db)
+	// 		return handler(appContext)
+	// 	}
+	// })
 
-			switch route.Method {
-			case "GET":
-				e.GET(route.Path, route.Handler).Name = routeName
-			case "POST":
-				e.POST(route.Path, route.Handler).Name = routeName
-			case "PUT":
-				e.PUT(route.Path, route.Handler).Name = routeName
-			case "DELETE":
-				e.DELETE(route.Path, route.Handler).Name = routeName
-			}
-		}
-	})
+	// secret := []byte("seqCEeCMUK8cd4RjMaARwqf8XnuZqkL567FysqRvZJyMTkM3H9uztKtykqtSJkqVNFhnERva")
+	// JWTMiddleware := middleware.JWT(secret)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	// routes.API.RegisterRoutes(func(routes model.Routes) {
+	// 	for routeName, route := range routes {
+	// 		if route.Restricted {
+	// 			// Restricted route reference implementation (minus echo.Group)
+	// 			// See: https://github.com/labstack/echox/blob/master/cookbook/jwt/map-claims/server.go#L43
+	// 			switch route.Method {
+	// 			case "GET":
+	// 				e.GET(route.Path, route.Handler, JWTMiddleware).Name = routeName
+	// 			case "POST":
+	// 				e.POST(route.Path, route.Handler, JWTMiddleware).Name = routeName
+	// 			case "PUT":
+	// 				e.PUT(route.Path, route.Handler, JWTMiddleware).Name = routeName
+	// 			case "DELETE":
+	// 				e.DELETE(route.Path, route.Handler, JWTMiddleware).Name = routeName
+	// 			}
+
+	// 			continue
+	// 		}
+
+	// 		switch route.Method {
+	// 		case "GET":
+	// 			e.GET(route.Path, route.Handler).Name = routeName
+	// 		case "POST":
+	// 			e.POST(route.Path, route.Handler).Name = routeName
+	// 		case "PUT":
+	// 			e.PUT(route.Path, route.Handler).Name = routeName
+	// 		case "DELETE":
+	// 			e.DELETE(route.Path, route.Handler).Name = routeName
+	// 		}
+	// 	}
+	// })
+
+	// e.Logger.Fatal(e.Start(":8080"))
 }

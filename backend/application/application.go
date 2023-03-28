@@ -2,8 +2,10 @@ package application
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"net/http"
 
+	"github.com/emicklei/go-restful/v3"
 	"go.uber.org/zap"
 )
 
@@ -14,16 +16,14 @@ type Process interface {
 
 // Application is a container that wraps required components
 type Application struct {
-	config Config
-}
-
-func ProviderApplication(config Config) *Application {
-	return &Application{config}
+	config    Config
+	container *restful.Container
+	server    *http.Server
 }
 
 type Option func(*Application)
 
-func NewApplicationx(opts ...Option) *Application {
+func NewApplication(opts ...Option) *Application {
 	app := &Application{}
 
 	for _, opt := range opts {
@@ -33,31 +33,25 @@ func NewApplicationx(opts ...Option) *Application {
 	return app
 }
 
-// NOTE: logger should be configured the earliest
-func WithLogger() Option {
-	return func(_ *Application) {
-		logger, err := zap.NewDevelopment()
-		if err != nil {
-			log.Fatalf("unable to instantiate zap development logger %s", err)
-		}
-		zap.ReplaceGlobals(logger)
-		zap.S().Info("logger set")
-	}
-}
-
-func (a *Application) AddResource(_ any) *Application {
-	return a
-}
-
 func (a *Application) Start(ctx context.Context) error {
-	zap.L().Info("app starting ...")
+	zap.S().Info("app starting ...")
 
-	zap.L().Info("app started")
-	return nil
+	a.server = &http.Server{
+		Addr:    fmt.Sprintf("%s:%s", a.config.Host, a.config.Port),
+		Handler: a.container,
+	}
+
+	// TODO: see labstack's echo implementation on starting http server
+	// to be able to listen prior logging
+	zap.S().Infof("http server started on %s", a.server.Addr)
+
+	return a.server.ListenAndServe()
 }
 
 func (a *Application) Stop(ctx context.Context) {
-	zap.L().Info("app stopping ...")
+	zap.S().Info("app stopping ...")
 
-	zap.L().Info("app stopped")
+	a.server.Shutdown(ctx)
+
+	zap.S().Info("app stopped")
 }

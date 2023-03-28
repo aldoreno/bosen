@@ -7,19 +7,53 @@
 package main
 
 import (
+	"bosen/application"
 	"bosen/pkg/auth"
+	"github.com/emicklei/go-restful/v3"
 )
 
 // Injectors from wire.go:
 
-func InitializeAuthSessAction() *auth.AuthenticateSessionAction {
+func InjectConfig() application.Config {
+	config := ProvideConfig()
+	return config
+}
+
+func InjectDbConfig() (application.DbConfig, error) {
+	config := InjectConfig()
+	dbConfig := config.Database
+	return dbConfig, nil
+}
+
+func InjectContainer() *restful.Container {
+	container := restful.NewContainer()
+	return container
+}
+
+func InjectAuthenticateSessionAction() *auth.AuthenticateSessionAction {
 	authService := auth.NewAuthService()
 	authenticateSessionAction := auth.NewAuthSessAction(authService)
 	return authenticateSessionAction
 }
 
-func InitializeAuthResource() *auth.AuthResource {
-	authenticateSessionAction := InitializeAuthSessAction()
+func InjectAuthResource() *auth.AuthResource {
+	authenticateSessionAction := InjectAuthenticateSessionAction()
 	authResource := auth.NewAuthResource(authenticateSessionAction)
 	return authResource
+}
+
+func InjectDiagnosticResource() *application.DiagnosticResource {
+	diagnosticResource := application.NewDiagnosticResource()
+	return diagnosticResource
+}
+
+// wire.go:
+
+func ProvideConfig() application.Config {
+	cfg := application.InitializeConfig()
+	return *cfg
+}
+
+func ProvideContainer() *restful.Container {
+	return restful.NewContainer()
 }

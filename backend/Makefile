@@ -33,12 +33,15 @@ init: ## Create environment variables
 clean: ## Clean build bin/
 	@rm -rf bin/$(APP_NAME)
 
+wire_gen.go: wire.go ## Generate dependency injection
+	wire
+
 .PHONY: build
-build: clean ## Build golang project
+build: clean wire_gen.go ## Build golang project
 	@echo "Compiling ..."
 	CGO_ENABLED=1 go build \
 		-v -race \
-		-tags jsoniter
+		-tags jsoniter \
 		-ldflags="\
 			-X \"bosen/manifest.AppName=$(APP_NAME)\" \
 			-X \"bosen/manifest.AppVersion=$(APP_VERSION)\" \
@@ -46,10 +49,11 @@ build: clean ## Build golang project
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
-		-o bin/$(APP_NAME) $(ENTRYPOINT)
+		-o bin/$(APP_NAME) \
+		$(ENTRYPOINT) wire_gen.go
 
 .PHONY: run
-run: ## Run golang project
+run: wire_gen.go ## Run golang project
 	go run \
 		-tags=jsoniter \
 		-ldflags="\
@@ -59,7 +63,7 @@ run: ## Run golang project
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
-		main.go
+		$(ENTRYPOINT) wire_gen.go
 
 .PHONY: test-local
 test-local: ## Run local golang tests
