@@ -11,25 +11,25 @@ import (
 // It is responsible to transform and validate input before passing it to
 // underlying Service that is decoupled from Infrastructure and Adapter code.
 type LoginAction struct {
-	svc *authService
+	svc LoginService
 }
 
-func NewLoginAction(svc *authService) *LoginAction {
+func NewLoginAction(svc LoginService) *LoginAction {
 	return &LoginAction{svc}
 }
 
 func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
-	var credentials LoginInput
-	if err := req.ReadEntity(&credentials); err != nil {
+	var input LoginInput
+	if err := req.ReadEntity(&input); err != nil {
 		response.WriteError(res, http.StatusBadRequest, err, restful.MIME_JSON)
 		return
 	}
 
-	var token AuthToken
-	if err := a.svc.Login(credentials, &token); err != nil {
+	output, err := a.svc.Login(req.Request.Context(), input)
+	if err != nil {
 		response.WriteError(res, http.StatusUnauthorized, err, restful.MIME_JSON)
 		return
 	}
 
-	response.WriteSuccess(res, http.StatusOK, &token, restful.MIME_JSON)
+	response.WriteSuccess(res, http.StatusOK, &output, restful.MIME_JSON)
 }

@@ -9,20 +9,23 @@ package main
 import (
 	"bosen/application"
 	"bosen/pkg/auth"
+	"bosen/pkg/database"
+	"bosen/pkg/user"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
 
 func InjectConfig() application.Config {
-	config := ProvideConfig()
+	config := application.ProvideConfig()
 	return config
 }
 
-func InjectDbConfig() (application.DbConfig, error) {
+func InjectDbConfig() database.DbConfig {
 	config := InjectConfig()
 	dbConfig := config.Database
-	return dbConfig, nil
+	return dbConfig
 }
 
 func InjectContainer() *restful.Container {
@@ -30,30 +33,47 @@ func InjectContainer() *restful.Container {
 	return container
 }
 
-func InjectLoginAction() *auth.LoginAction {
-	authService := auth.NewAuthService()
-	loginAction := auth.NewLoginAction(authService)
-	return loginAction
-}
-
-func InjectAuthResource() *auth.AuthResource {
-	loginAction := InjectLoginAction()
-	authResource := auth.NewAuthResource(loginAction)
-	return authResource
-}
-
 func InjectDiagnosticResource() *application.DiagnosticResource {
 	diagnosticResource := application.NewDiagnosticResource()
 	return diagnosticResource
 }
 
-// wire.go:
-
-func ProvideConfig() application.Config {
-	cfg := application.InitializeConfig()
-	return *cfg
+func InjectLoginAction() *auth.LoginAction {
+	dbConfig := InjectDbConfig()
+	db := database.ProvideDatabase(dbConfig)
+	userRepositoryImpl := user.NewUserRepositoryImpl(db)
+	loginServiceImpl := auth.NewAuthServiceImpl(userRepositoryImpl)
+	loginAction := auth.NewLoginAction(loginServiceImpl)
+	return loginAction
 }
+
+func InjectAuthResource() *auth.AuthResource {
+	dbConfig := InjectDbConfig()
+	db := database.ProvideDatabase(dbConfig)
+	userRepositoryImpl := user.NewUserRepositoryImpl(db)
+	loginServiceImpl := auth.NewAuthServiceImpl(userRepositoryImpl)
+	loginAction := auth.NewLoginAction(loginServiceImpl)
+	authResource := auth.NewAuthResource(loginAction)
+	return authResource
+}
+
+// wire.go:
 
 func ProvideContainer() *restful.Container {
 	return restful.NewContainer()
 }
+
+// UserRepositorySet provides `user.UserRepository` (an interface)
+// This can be done by binding interface.
+// See: https://github.com/google/wire/blob/main/docs/guide.md#binding-interfaces
+var UserRepositorySet = wire.NewSet(
+	InjectDbConfig, database.ProvideDatabase, user.NewUserRepositoryImpl, wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
+)
+
+var AuthServiceSet = wire.NewSet(
+	UserRepositorySet, auth.NewAuthServiceImpl, wire.Bind(new(auth.LoginService), new(*auth.LoginServiceImpl)),
+)
+
+var LoginActionSet = wire.NewSet(AuthServiceSet, auth.NewLoginAction)
+
+var AuthResourceSet = wire.NewSet(LoginActionSet, auth.NewAuthResource)

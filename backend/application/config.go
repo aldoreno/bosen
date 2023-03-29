@@ -1,30 +1,22 @@
 package application
 
 import (
+	"bosen/pkg/database"
 	"fmt"
 
 	"github.com/kelseyhightower/envconfig"
 	"go.uber.org/zap"
 )
 
-type DbConfig struct {
-	Driver   string `envconfig:"driver"`
-	User     string `envconfig:"user"`
-	Password string `envconfig:"password"`
-	Name     string `envconfig:"name"`
-	Host     string `envconfig:"host"`
-	Port     string `envconfig:"port"`
-}
-
 type Config struct {
-	Host     string   `envconfig:"host"`
-	Port     string   `envconfig:"port"`
-	Database DbConfig `envconfig:"primary_db"`
+	Host     string            `envconfig:"host"`
+	Port     string            `envconfig:"port"`
+	Database database.DbConfig `envconfig:"primary_db"`
 }
 
 var cfg *Config
 
-func InitializeConfig() *Config {
+func GetConfig() *Config {
 	if cfg != nil {
 		return cfg
 	}
@@ -43,4 +35,9 @@ func InitializeConfig() *Config {
 	// zap.S().Infof("loaded configuration: %+v", cfg)
 
 	return cfg
+}
+
+func ProvideConfig() Config {
+	cfg := GetConfig()
+	return *cfg
 }

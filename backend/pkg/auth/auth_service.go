@@ -1,27 +1,59 @@
 package auth
 
-var _ AuthService = (*authService)(nil)
+import (
+	"bosen/pkg/domain"
+	"bosen/pkg/user"
+	"context"
+)
 
-type AuthService interface {
-	Login(LoginInput, *AuthToken) error
+var _ LoginService = (*LoginServiceImpl)(nil)
+
+type (
+	LoginInput struct {
+		Username string `json:"username" validate:"required"`
+		Password string `json:"password" validate:"required"`
+	}
+
+	LoginPresenter interface {
+		Output(domain.Token) LoginOutput
+	}
+
+	LoginOutput struct {
+		Token string `json:"token"`
+	}
+
+	LoginService interface {
+		Login(context.Context, LoginInput) (LoginOutput, error)
+	}
+
+	LoginServiceImpl struct {
+		userRepo  user.UserRepository
+		presenter LoginPresenter
+	}
+)
+
+func NewAuthServiceImpl(userRepo user.UserRepository) *LoginServiceImpl {
+	return &LoginServiceImpl{
+		userRepo: userRepo,
+	}
 }
 
-type authService struct{}
+func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (LoginOutput, error) {
+	var account user.User
 
-func NewAuthService() *authService {
-	return &authService{}
-}
+	criteria := user.FindCriteria{
+		Username: credentials.Username,
+	}
 
-func (a *authService) Login(credentials LoginInput, token *AuthToken) error {
-	if credentials.Username != "leo" {
-		return ErrAccountNotFound
+	if err := s.userRepo.FindOne(ctx, criteria, &account); err != nil {
+		return s.presenter.Output(domain.Token{}), ErrAccountNotFound
 	}
 
 	if credentials.Password != "password" {
-		return ErrWrongUsernameOrPassword
+		return s.presenter.Output(domain.Token{}), ErrWrongUsernameOrPassword
 	}
 
-	*token = AuthToken{Token: "123"}
+	token := domain.Token{}
 
-	return nil
+	return s.presenter.Output(token), nil
 }
