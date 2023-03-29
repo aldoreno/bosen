@@ -31,5 +31,5 @@ func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
 		return
 	}
 
-	response.WriteSuccess(res, http.StatusUnauthorized, &token, restful.MIME_JSON)
+	response.WriteSuccess(res, http.StatusOK, &token, restful.MIME_JSON)
 }
