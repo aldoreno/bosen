@@ -19,21 +19,17 @@ func NewLoginAction(svc *authService) *LoginAction {
 }
 
 func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
-	var (
-		err         error
-		credentials LoginInput
-	)
-
-	if err = req.ReadEntity(&credentials); err != nil {
-		res.WriteHeaderAndJson(http.StatusBadRequest, err, restful.MIME_JSON)
+	var credentials LoginInput
+	if err := req.ReadEntity(&credentials); err != nil {
+		response.WriteError(res, http.StatusBadRequest, err, restful.MIME_JSON)
 		return
 	}
 
-	token, err := a.svc.Login(credentials)
-	if err != nil {
+	var token AuthToken
+	if err := a.svc.Login(credentials, &token); err != nil {
 		response.WriteError(res, http.StatusUnauthorized, err, restful.MIME_JSON)
 		return
 	}
 
-	res.WriteAsJson(&token)
+	response.WriteSuccess(res, http.StatusUnauthorized, &token, restful.MIME_JSON)
 }
