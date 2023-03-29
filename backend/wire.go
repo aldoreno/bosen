@@ -38,13 +38,13 @@ func InjectContainer() *restful.Container {
 	return &restful.Container{}
 }
 
-func InjectAuthenticateSessionAction() *auth.AuthenticateSessionAction {
-	wire.Build(auth.NewAuthSessAction, auth.NewAuthService)
-	return &auth.AuthenticateSessionAction{}
+func InjectLoginAction() *auth.LoginAction {
+	wire.Build(auth.NewLoginAction, auth.NewAuthService)
+	return &auth.LoginAction{}
 }
 
 func InjectAuthResource() *auth.AuthResource {
-	wire.Build(InjectAuthenticateSessionAction, auth.NewAuthResource)
+	wire.Build(InjectLoginAction, auth.NewAuthResource)
 	return &auth.AuthResource{}
 }
 

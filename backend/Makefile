@@ -65,6 +65,19 @@ run: wire_gen.go ## Run golang project
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
 		$(ENTRYPOINT) wire_gen.go
 
+.PHONY: watch
+watch: wire_gen.go ## Run golang project
+	gow run \
+		-tags=jsoniter \
+		-ldflags="\
+			-X \"bosen/manifest.AppName=$(APP_NAME)\" \
+			-X \"bosen/manifest.AppVersion=$(APP_VERSION)\" \
+			-X \"bosen/manifest.BuildTime=$(BUILD_TIME)\" \
+			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
+			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
+			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
+		$(ENTRYPOINT) wire_gen.go
+
 .PHONY: test-local
 test-local: ## Run local golang tests
 	go test -cover -race ./...

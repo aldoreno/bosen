@@ -9,12 +9,12 @@ import (
 
 // Infrastructure-level code tightly coupled with go-restul/v3
 type AuthResource struct {
-	authenticateSessionAction *AuthenticateSessionAction
+	loginAction *LoginAction
 }
 
-func NewAuthResource(authenticate *AuthenticateSessionAction) *AuthResource {
+func NewAuthResource(loginAction *LoginAction) *AuthResource {
 	return &AuthResource{
-		authenticateSessionAction: authenticate,
+		loginAction: loginAction,
 	}
 }
 
@@ -24,9 +24,9 @@ func (r *AuthResource) WebService() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	ws.Route(ws.POST("/authenticate/{sessionId}").To(r.authenticateSessionAction.Handler).
+	ws.Route(ws.POST("/login").To(r.loginAction.Handler).
 		Doc("user authentication").
-		Metadata(restfulspec.KeyOpenAPITags, []string{"auth", "user", "session"}).
+		Metadata(restfulspec.KeyOpenAPITags, []string{"auth", "user", "login"}).
 		Writes(AuthToken{}).
 		Returns(http.StatusOK, http.StatusText(http.StatusOK), &AuthToken{}).
 		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), nil).

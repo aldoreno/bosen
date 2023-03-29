@@ -30,15 +30,15 @@ func InjectContainer() *restful.Container {
 	return container
 }
 
-func InjectAuthenticateSessionAction() *auth.AuthenticateSessionAction {
+func InjectLoginAction() *auth.LoginAction {
 	authService := auth.NewAuthService()
-	authenticateSessionAction := auth.NewAuthSessAction(authService)
-	return authenticateSessionAction
+	loginAction := auth.NewLoginAction(authService)
+	return loginAction
 }
 
 func InjectAuthResource() *auth.AuthResource {
-	authenticateSessionAction := InjectAuthenticateSessionAction()
-	authResource := auth.NewAuthResource(authenticateSessionAction)
+	loginAction := InjectLoginAction()
+	authResource := auth.NewAuthResource(loginAction)
 	return authResource
 }
 
