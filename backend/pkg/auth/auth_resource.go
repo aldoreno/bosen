@@ -27,8 +27,8 @@ func (r *AuthResource) WebService() *restful.WebService {
 	ws.Route(ws.POST("/login").To(r.loginAction.Handler).
 		Doc("user authentication").
 		Metadata(restfulspec.KeyOpenAPITags, []string{"auth", "user", "login"}).
-		Writes(AuthToken{}).
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), &AuthToken{}).
+		Writes(&LoginOutput{}).
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), &LoginOutput{}).
 		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), nil).
 		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil),
 	)
