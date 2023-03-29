@@ -9,6 +9,7 @@ package main
 import (
 	"bosen/application"
 	"bosen/pkg/auth"
+	"bosen/pkg/auth/login"
 	"bosen/pkg/database"
 	"bosen/pkg/user"
 	"github.com/emicklei/go-restful/v3"
@@ -38,12 +39,13 @@ func InjectDiagnosticResource() *application.DiagnosticResource {
 	return diagnosticResource
 }
 
-func InjectLoginAction() *auth.LoginAction {
+func InjectLoginAction() *login.LoginAction {
 	dbConfig := InjectDbConfig()
 	db := database.ProvideDatabase(dbConfig)
 	userRepositoryImpl := user.NewUserRepositoryImpl(db)
-	loginServiceImpl := auth.NewAuthServiceImpl(userRepositoryImpl)
-	loginAction := auth.NewLoginAction(loginServiceImpl)
+	loginPresenter := login.NewLoginPresenter()
+	loginServiceImpl := login.NewLoginServiceImpl(userRepositoryImpl, loginPresenter)
+	loginAction := login.NewLoginAction(loginServiceImpl)
 	return loginAction
 }
 
@@ -51,8 +53,9 @@ func InjectAuthResource() *auth.AuthResource {
 	dbConfig := InjectDbConfig()
 	db := database.ProvideDatabase(dbConfig)
 	userRepositoryImpl := user.NewUserRepositoryImpl(db)
-	loginServiceImpl := auth.NewAuthServiceImpl(userRepositoryImpl)
-	loginAction := auth.NewLoginAction(loginServiceImpl)
+	loginPresenter := login.NewLoginPresenter()
+	loginServiceImpl := login.NewLoginServiceImpl(userRepositoryImpl, loginPresenter)
+	loginAction := login.NewLoginAction(loginServiceImpl)
 	authResource := auth.NewAuthResource(loginAction)
 	return authResource
 }
@@ -70,10 +73,10 @@ var UserRepositorySet = wire.NewSet(
 	InjectDbConfig, database.ProvideDatabase, user.NewUserRepositoryImpl, wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
 )
 
-var AuthServiceSet = wire.NewSet(
-	UserRepositorySet, auth.NewAuthServiceImpl, wire.Bind(new(auth.LoginService), new(*auth.LoginServiceImpl)),
+var LoginServiceSet = wire.NewSet(
+	UserRepositorySet, login.NewLoginPresenter, login.NewLoginServiceImpl, wire.Bind(new(login.LoginService), new(*login.LoginServiceImpl)),
 )
 
-var LoginActionSet = wire.NewSet(AuthServiceSet, auth.NewLoginAction)
+var LoginActionSet = wire.NewSet(LoginServiceSet, login.NewLoginAction)
 
 var AuthResourceSet = wire.NewSet(LoginActionSet, auth.NewAuthResource)

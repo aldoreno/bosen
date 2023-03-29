@@ -1,4 +1,4 @@
-package auth
+package login
 
 import (
 	"bosen/pkg/domain"
@@ -32,10 +32,8 @@ type (
 	}
 )
 
-func NewAuthServiceImpl(userRepo user.UserRepository) *LoginServiceImpl {
-	return &LoginServiceImpl{
-		userRepo: userRepo,
-	}
+func NewLoginServiceImpl(userRepo user.UserRepository, presenter LoginPresenter) *LoginServiceImpl {
+	return &LoginServiceImpl{userRepo, presenter}
 }
 
 func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (LoginOutput, error) {

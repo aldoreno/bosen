@@ -6,6 +6,7 @@ package main
 import (
 	"bosen/application"
 	"bosen/pkg/auth"
+	"bosen/pkg/auth/login"
 	"bosen/pkg/database"
 	"bosen/pkg/user"
 
@@ -50,19 +51,20 @@ var UserRepositorySet = wire.NewSet(
 	wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
 )
 
-var AuthServiceSet = wire.NewSet(
+var LoginServiceSet = wire.NewSet(
 	UserRepositorySet,
-	auth.NewAuthServiceImpl,
-	wire.Bind(new(auth.LoginService), new(*auth.LoginServiceImpl)),
+	login.NewLoginPresenter,
+	login.NewLoginServiceImpl,
+	wire.Bind(new(login.LoginService), new(*login.LoginServiceImpl)),
 )
 
-var LoginActionSet = wire.NewSet(AuthServiceSet, auth.NewLoginAction)
+var LoginActionSet = wire.NewSet(LoginServiceSet, login.NewLoginAction)
 
 var AuthResourceSet = wire.NewSet(LoginActionSet, auth.NewAuthResource)
 
-func InjectLoginAction() *auth.LoginAction {
+func InjectLoginAction() *login.LoginAction {
 	wire.Build(LoginActionSet)
-	return &auth.LoginAction{}
+	return &login.LoginAction{}
 }
 
 func InjectAuthResource() *auth.AuthResource {
