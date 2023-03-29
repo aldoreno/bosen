@@ -5,7 +5,7 @@ BUILD_TIME:=$(shell date)
 
 APP_NAME:=bosen-backend
 APP_VERSION:=${COMMIT_HASH}
-ENTRYPOINT?=./main.go
+ENTRYPOINT?=bosen # Package name; see: https://pkg.go.dev/cmd/go#hdr-Compile_and_run_Go_program
 
 IMAGE_REGISTRY:=docker.io/aldoreno
 IMAGE_NAME:=$(IMAGE_REGISTRY)/$(APP_NAME)
@@ -50,7 +50,7 @@ build: clean wire_gen.go ## Build golang project
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
 		-o bin/$(APP_NAME) \
-		$(ENTRYPOINT) wire_gen.go
+		$(ENTRYPOINT)
 
 .PHONY: run
 run: wire_gen.go ## Run golang project
@@ -63,7 +63,7 @@ run: wire_gen.go ## Run golang project
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
-		$(ENTRYPOINT) wire_gen.go
+		$(ENTRYPOINT)
 
 .PHONY: watch
 watch: wire_gen.go ## Run golang project
@@ -76,7 +76,7 @@ watch: wire_gen.go ## Run golang project
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
-		$(ENTRYPOINT) wire_gen.go
+		$(ENTRYPOINT)
 
 .PHONY: test-local
 test-local: ## Run local golang tests
