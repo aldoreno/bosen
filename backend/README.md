@@ -1,12 +1,31 @@
+## Overview
+
+Bosen were meant to be a proof of concept of monorepo project. That being said this sub-project (**backend**) is the application responsible for providing APIs. The end goal of this project is to be a reference (or template) project.
+
+This project implements Clean Code meaning dependency direction are going inward; no inner components depends on outer components.
+
 ## How to run
 
-### Initialise database with data
+1. Create new PostgreSQL instance `docker-compose up -d db`
 
-See `etc/db/postgresql/*.sql`
+2. Initialise database with [schema](migrations/postgresql/).
 
-### Build and run
+   Using docker:
 
-```
-$ go build
-./bosen
-```
+   ```shell scripts/import_db.sh
+   docker run \
+        --rm \
+        -it \
+        -v $(pwd)/scripts/.pgpass:/root/.pgpass \
+        -v $(pwd)/migrations/postgresql:/tmp \
+        --link postgres_local:postgredb \
+        --network backend_default \
+        postgres:15-alpine \
+        sh -c "psql -h postgredb -U cmsuser cms < /tmp/001_initial_tables_definition.sql"
+   ```
+
+   NOTE: See [docker-compose.yml](docker-compose.yml) for default database credentials and informations. If you make adjustments, please reflect you changes in [.pgpass](scripts/.pgpass) and `scripts/*.sh`.
+
+3. Duplicate `.env.example` to `.env` then update its values
+
+4. `make run`
