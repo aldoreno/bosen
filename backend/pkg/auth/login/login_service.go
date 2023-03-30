@@ -48,7 +48,7 @@ func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (L
 		return s.presenter.Output(domain.Token{}), err
 	}
 
-	if credentials.Password != "password" {
+	if account.Password != credentials.Password {
 		return s.presenter.Output(domain.Token{}), errors.ErrWrongUsernameOrPassword
 	}
 

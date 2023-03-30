@@ -12,3 +12,7 @@ type (
 		LastName   string    `gorm:"column:lastName;"`
 	}
 )
+
+func (u User) TableName() string {
+	return "userinfo"
+}

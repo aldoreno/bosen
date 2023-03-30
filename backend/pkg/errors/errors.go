@@ -11,7 +11,7 @@ type (
 		Message string  `json:"message"`
 		Code    ErrCode `json:"code"`
 		Op      string  `json:"operation"`
-		Err     error   `json:"-"`
+		Err     error   `json:"meta"`
 	}
 )
 

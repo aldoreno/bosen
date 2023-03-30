@@ -33,7 +33,7 @@ func (c FindCriteria) Map() map[string]any {
 	output := make(map[string]any)
 
 	if c.Username != "" {
-		output["Username"] = c.Username
+		output["username"] = c.Username
 	}
 
 	return output
