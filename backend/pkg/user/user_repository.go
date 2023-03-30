@@ -1,8 +1,11 @@
 package user
 
 import (
+	errs "bosen/pkg/errors"
 	"context"
+	"errors"
 
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -20,24 +23,32 @@ type (
 	FindCriteria struct {
 		Username string
 	}
-
-	User struct {
-		gorm.Model
-		ID         uint
-		Username   string
-		Password   string
-		FirstName  string
-		MiddleName string
-		LastName   string
-	}
 )
 
 func NewUserRepositoryImpl(db *gorm.DB) *UserRepositoryImpl {
 	return &UserRepositoryImpl{db}
 }
 
-func (r *UserRepositoryImpl) FindOne(_ context.Context, criteria FindCriteria, user *User) error {
-	var user_ User
-	r.db.Model(&user_).Find(&user_)
+func (c FindCriteria) Map() map[string]any {
+	output := make(map[string]any)
+
+	if c.Username != "" {
+		output["Username"] = c.Username
+	}
+
+	return output
+}
+
+func (r *UserRepositoryImpl) FindOne(ctx context.Context, criteria FindCriteria, user *User) error {
+	result := r.db.Model(user).Where(criteria.Map()).First(user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errs.ErrAccountNotFound
+		}
+
+		zap.S().Errorf("userRepo.FindOne error: %w", result.Error)
+		return errs.WrapDbError(result.Error)
+	}
+
 	return nil
 }
