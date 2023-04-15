@@ -62,10 +62,6 @@ func InjectAuthResource() *auth.AuthResource {
 
 // wire.go:
 
-func ProvideContainer() *restful.Container {
-	return restful.NewContainer()
-}
-
 // UserRepositorySet provides `user.UserRepository` (an interface)
 // This can be done by binding interface.
 // See: https://github.com/google/wire/blob/main/docs/guide.md#binding-interfaces

@@ -27,10 +27,6 @@ func InjectDbConfig() database.DbConfig {
 	return database.DbConfig{}
 }
 
-func ProvideContainer() *restful.Container {
-	return restful.NewContainer()
-}
-
 func InjectContainer() *restful.Container {
 	wire.Build(restful.NewContainer)
 	return &restful.Container{}
