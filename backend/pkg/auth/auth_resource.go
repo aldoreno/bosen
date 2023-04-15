@@ -31,7 +31,7 @@ func (r *AuthResource) WebService() *restful.WebService {
 		Writes(&login.LoginOutput{}).
 		Returns(http.StatusOK, http.StatusText(http.StatusOK), &login.LoginOutput{}).
 		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), nil).
-		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil),
+		Returns(http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized), nil),
 	)
 
 	return ws

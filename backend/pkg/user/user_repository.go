@@ -43,7 +43,7 @@ func (r *UserRepositoryImpl) FindOne(ctx context.Context, criteria FindCriteria,
 	result := r.db.Model(user).Where(criteria.Map()).First(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return errs.ErrAccountNotFound
+			return errs.ErrUserNotFound
 		}
 
 		zap.S().Errorf("userRepo.FindOne error: %w", result.Error)

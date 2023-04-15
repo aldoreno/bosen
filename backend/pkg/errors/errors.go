@@ -48,17 +48,17 @@ func WrapDbError(err error) *AppError {
 }
 
 const (
-	E_AUTH_CREDENTIALS  ErrCode = "E_AUTH_CREDENTIALS"
-	E_ACCOUNT_NOT_FOUND         = "E_AUTH_ACCOUNT"
-	E_DB_OPERATION              = "E_AUTH_DB_ERR"
+	E_AUTH_CREDENTIALS ErrCode = "E_AUTH_CREDENTIALS"
+	E_USER_NOT_FOUND           = "E_USER_NOT_FOUND"
+	E_DB_OPERATION             = "E_DB_ERR"
 )
 
 type translation map[ErrCode]string
 
 var en translation = map[ErrCode]string{
-	E_AUTH_CREDENTIALS:  "wrong username or password",
-	E_ACCOUNT_NOT_FOUND: "account not found",
-	E_DB_OPERATION:      "database operation issue",
+	E_AUTH_CREDENTIALS: "wrong username or password",
+	E_USER_NOT_FOUND:   "user not found",
+	E_DB_OPERATION:     "database operation issue",
 }
 
 // Translations table
@@ -68,6 +68,6 @@ var _ map[string]translation = map[string]translation{
 }
 
 var (
-	ErrWrongUsernameOrPassword = newError(en[E_AUTH_CREDENTIALS], E_AUTH_CREDENTIALS)
-	ErrAccountNotFound         = newError(en[E_ACCOUNT_NOT_FOUND], E_ACCOUNT_NOT_FOUND)
+	ErrAuthCredentials = newError(en[E_AUTH_CREDENTIALS], E_AUTH_CREDENTIALS)
+	ErrUserNotFound    = newError(en[E_USER_NOT_FOUND], E_USER_NOT_FOUND)
 )

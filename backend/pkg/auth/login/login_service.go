@@ -5,6 +5,7 @@ import (
 	"bosen/pkg/errors"
 	"bosen/pkg/user"
 	"context"
+	stderrors "errors"
 )
 
 var _ LoginService = (*LoginServiceImpl)(nil)
@@ -45,14 +46,21 @@ func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (L
 	}
 
 	if err := s.userRepo.FindOne(ctx, criteria, &account); err != nil {
+		switch {
+		case stderrors.Is(err, errors.ErrUserNotFound):
+			err = errors.ErrAuthCredentials
+		}
+
 		return s.presenter.Output(domain.Token{}), err
 	}
 
 	if account.Password != credentials.Password {
-		return s.presenter.Output(domain.Token{}), errors.ErrWrongUsernameOrPassword
+		return s.presenter.Output(domain.Token{}), errors.ErrAuthCredentials
 	}
 
-	token := domain.Token{}
+	token := domain.Token{
+		Value: "123",
+	}
 
 	return s.presenter.Output(token), nil
 }

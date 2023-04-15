@@ -62,11 +62,15 @@ func InjectAuthResource() *auth.AuthResource {
 
 // wire.go:
 
+var DatabaseSet = wire.NewSet(
+	InjectDbConfig, database.ProvideDatabase,
+)
+
 // UserRepositorySet provides `user.UserRepository` (an interface)
 // This can be done by binding interface.
 // See: https://github.com/google/wire/blob/main/docs/guide.md#binding-interfaces
 var UserRepositorySet = wire.NewSet(
-	InjectDbConfig, database.ProvideDatabase, user.NewUserRepositoryImpl, wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
+	DatabaseSet, user.NewUserRepositoryImpl, wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
 )
 
 var LoginServiceSet = wire.NewSet(

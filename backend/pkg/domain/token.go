@@ -1,9 +1,9 @@
 package domain
 
 type Token struct {
-	value string
+	Value string
 }
 
 func (t Token) String() string {
-	return t.value
+	return t.Value
 }
