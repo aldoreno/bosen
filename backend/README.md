@@ -1,16 +1,19 @@
 ## Overview
 
-Bosen were meant to be a proof of concept of monorepo project. That being said this sub-project (**backend**) is the application responsible for providing APIs. The end goal of this project is to be a reference (or template) project.
+Bosen were meant to be a proof of concept of monorepo project.
+That being said **backend** is the APIs providing application.
+The end goal of this project is to be a reference (or template) project.
 
-This project implements Clean Code meaning dependency direction are going inward; no inner components depends on outer components.
+This project tries to implements Clean Code e.g. dependency direction are going
+inward hence no inner components depends on outer components.
 
 ## How to run
 
 1. Create new PostgreSQL instance `docker-compose up -d db`
 
-2. Initialise database with [schema](migrations/postgresql/).
+2. Initialise database with [schema](./migrations/postgresql/).
 
-   Using docker:
+   Using Docker:
 
    ```shell scripts/import_db.sh
    docker run \
