@@ -1,10 +1,9 @@
 package login
 
 import (
-	"bosen/pkg/auth/helper"
 	"bosen/pkg/domain"
 	"bosen/pkg/errors"
-	"bosen/pkg/user"
+	userpkg "bosen/pkg/user"
 	"context"
 	stderrors "errors"
 )
@@ -30,23 +29,23 @@ type (
 	}
 
 	LoginServiceImpl struct {
-		userRepo  user.UserRepository
+		userRepo  userpkg.UserRepository
 		presenter LoginPresenter
 	}
 )
 
-func NewLoginServiceImpl(userRepo user.UserRepository, presenter LoginPresenter) *LoginServiceImpl {
+func NewLoginServiceImpl(userRepo userpkg.UserRepository, presenter LoginPresenter) *LoginServiceImpl {
 	return &LoginServiceImpl{userRepo, presenter}
 }
 
 func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (LoginOutput, error) {
-	var account user.UserModel
+	var user domain.UserModel
 
-	criteria := user.FindCriteria{
+	criteria := userpkg.FindCriteria{
 		Username: credentials.Username,
 	}
 
-	if err := s.userRepo.FindOne(ctx, criteria, &account); err != nil {
+	if err := s.userRepo.FindOne(ctx, criteria, &user); err != nil {
 		switch {
 		case stderrors.Is(err, errors.ErrUserNotFound):
 			err = errors.ErrAuthCredentials
@@ -55,7 +54,7 @@ func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (L
 		return s.presenter.Output(domain.Token{}), err
 	}
 
-	if !helper.CheckPasswordHash(account.Password, credentials.Password) {
+	if !user.Password.CheckPasswordHash(credentials.Password) {
 		return s.presenter.Output(domain.Token{}), errors.ErrAuthCredentials
 	}
 

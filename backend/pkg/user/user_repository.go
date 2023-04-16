@@ -1,6 +1,7 @@
 package user
 
 import (
+	"bosen/pkg/domain"
 	errs "bosen/pkg/errors"
 	"context"
 	"errors"
@@ -13,7 +14,7 @@ var _ UserRepository = (*UserRepositoryImpl)(nil)
 
 type (
 	UserRepository interface {
-		FindOne(context.Context, FindCriteria, *UserModel) error
+		FindOne(context.Context, FindCriteria, *domain.UserModel) error
 	}
 
 	UserRepositoryImpl struct {
@@ -39,7 +40,7 @@ func (c FindCriteria) Map() map[string]any {
 	return output
 }
 
-func (r *UserRepositoryImpl) FindOne(ctx context.Context, criteria FindCriteria, user *UserModel) error {
+func (r *UserRepositoryImpl) FindOne(ctx context.Context, criteria FindCriteria, user *domain.UserModel) error {
 	result := r.db.Model(user).Where(criteria.Map()).First(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
