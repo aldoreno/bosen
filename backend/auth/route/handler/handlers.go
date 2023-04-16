@@ -2,8 +2,8 @@ package handler
 
 import (
 	"bosen/application"
-	AuthHelper "bosen/auth/helper"
 	"bosen/model"
+	AuthHelper "bosen/pkg/auth/helper"
 	"net/http"
 	"time"
 

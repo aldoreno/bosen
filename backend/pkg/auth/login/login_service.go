@@ -1,6 +1,7 @@
 package login
 
 import (
+	"bosen/pkg/auth/helper"
 	"bosen/pkg/domain"
 	"bosen/pkg/errors"
 	"bosen/pkg/user"
@@ -54,7 +55,7 @@ func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (L
 		return s.presenter.Output(domain.Token{}), err
 	}
 
-	if account.Password != credentials.Password {
+	if !helper.CheckPasswordHash(account.Password, credentials.Password) {
 		return s.presenter.Output(domain.Token{}), errors.ErrAuthCredentials
 	}
 

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"bosen/application"
-	AuthHelper "bosen/auth/helper"
 	"bosen/model"
+	AuthHelper "bosen/pkg/auth/helper"
 	"fmt"
 
 	"github.com/labstack/echo"
