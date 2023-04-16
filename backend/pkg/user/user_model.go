@@ -3,7 +3,7 @@ package user
 import uuid "github.com/satori/go.uuid"
 
 type (
-	User struct {
+	UserModel struct {
 		ID         uuid.UUID `gorm:"column:uid;primarykey"`
 		Username   string    `gorm:"column:username;"`
 		Password   string    `gorm:"column:password;"`
@@ -13,6 +13,6 @@ type (
 	}
 )
 
-func (u User) TableName() string {
+func (u UserModel) TableName() string {
 	return "userinfo"
 }

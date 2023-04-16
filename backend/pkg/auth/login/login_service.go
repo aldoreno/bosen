@@ -39,7 +39,7 @@ func NewLoginServiceImpl(userRepo user.UserRepository, presenter LoginPresenter)
 }
 
 func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (LoginOutput, error) {
-	var account user.User
+	var account user.UserModel
 
 	criteria := user.FindCriteria{
 		Username: credentials.Username,
