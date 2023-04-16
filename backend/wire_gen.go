@@ -43,8 +43,9 @@ func InjectLoginAction() *login.LoginAction {
 	dbConfig := InjectDbConfig()
 	db := database.ProvideDatabase(dbConfig)
 	userRepositoryImpl := user.NewUserRepositoryImpl(db)
-	loginPresenter := login.NewLoginPresenter()
-	loginServiceImpl := login.NewLoginServiceImpl(userRepositoryImpl, loginPresenter)
+	config := InjectConfig()
+	loginPresenterImpl := login.NewLoginPresenter(config)
+	loginServiceImpl := login.NewLoginServiceImpl(userRepositoryImpl, loginPresenterImpl)
 	loginAction := login.NewLoginAction(loginServiceImpl)
 	return loginAction
 }
@@ -53,8 +54,9 @@ func InjectAuthResource() *auth.AuthResource {
 	dbConfig := InjectDbConfig()
 	db := database.ProvideDatabase(dbConfig)
 	userRepositoryImpl := user.NewUserRepositoryImpl(db)
-	loginPresenter := login.NewLoginPresenter()
-	loginServiceImpl := login.NewLoginServiceImpl(userRepositoryImpl, loginPresenter)
+	config := InjectConfig()
+	loginPresenterImpl := login.NewLoginPresenter(config)
+	loginServiceImpl := login.NewLoginServiceImpl(userRepositoryImpl, loginPresenterImpl)
 	loginAction := login.NewLoginAction(loginServiceImpl)
 	authResource := auth.NewAuthResource(loginAction)
 	return authResource
@@ -73,8 +75,13 @@ var UserRepositorySet = wire.NewSet(
 	DatabaseSet, user.NewUserRepositoryImpl, wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
 )
 
+var LoginPresenterSet = wire.NewSet(
+	InjectConfig, login.NewLoginPresenter, wire.Bind(new(login.LoginPresenter), new(*login.LoginPresenterImpl)),
+)
+
 var LoginServiceSet = wire.NewSet(
-	UserRepositorySet, login.NewLoginPresenter, login.NewLoginServiceImpl, wire.Bind(new(login.LoginService), new(*login.LoginServiceImpl)),
+	UserRepositorySet,
+	LoginPresenterSet, login.NewLoginServiceImpl, wire.Bind(new(login.LoginService), new(*login.LoginServiceImpl)),
 )
 
 var LoginActionSet = wire.NewSet(LoginServiceSet, login.NewLoginAction)

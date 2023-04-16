@@ -16,6 +16,10 @@ type (
 	}
 )
 
+func (u Username) String() string {
+	return string(u)
+}
+
 func (u UserModel) TableName() string {
 	return "userinfo"
 }

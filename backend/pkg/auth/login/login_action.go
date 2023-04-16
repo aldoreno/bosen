@@ -1,7 +1,9 @@
 package login
 
 import (
+	errs "bosen/pkg/errors"
 	"bosen/pkg/response"
+	"errors"
 	"net/http"
 
 	restful "github.com/emicklei/go-restful/v3"
@@ -27,7 +29,12 @@ func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
 
 	output, err := a.svc.Login(req.Request.Context(), input)
 	if err != nil {
-		response.WriteError(res, http.StatusUnauthorized, err, restful.MIME_JSON)
+		switch {
+		case errors.Is(err, errs.ErrAuthCredentials):
+			response.WriteError(res, http.StatusUnauthorized, err, restful.MIME_JSON)
+		default:
+			response.WriteError(res, http.StatusInternalServerError, err, restful.MIME_JSON)
+		}
 		return
 	}
 

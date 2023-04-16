@@ -51,9 +51,15 @@ var UserRepositorySet = wire.NewSet(
 	wire.Bind(new(user.UserRepository), new(*user.UserRepositoryImpl)),
 )
 
+var LoginPresenterSet = wire.NewSet(
+	InjectConfig,
+	login.NewLoginPresenter,
+	wire.Bind(new(login.LoginPresenter), new(*login.LoginPresenterImpl)),
+)
+
 var LoginServiceSet = wire.NewSet(
 	UserRepositorySet,
-	login.NewLoginPresenter,
+	LoginPresenterSet,
 	login.NewLoginServiceImpl,
 	wire.Bind(new(login.LoginService), new(*login.LoginServiceImpl)),
 )

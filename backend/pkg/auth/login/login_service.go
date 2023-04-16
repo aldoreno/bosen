@@ -2,10 +2,10 @@ package login
 
 import (
 	"bosen/pkg/domain"
-	"bosen/pkg/errors"
+	errs "bosen/pkg/errors"
 	userpkg "bosen/pkg/user"
 	"context"
-	stderrors "errors"
+	"errors"
 )
 
 var _ LoginService = (*LoginServiceImpl)(nil)
@@ -17,7 +17,7 @@ type (
 	}
 
 	LoginPresenter interface {
-		Output(domain.Token) LoginOutput
+		Output(context.Context, *domain.UserModel) (*LoginOutput, error)
 	}
 
 	LoginOutput struct {
@@ -25,7 +25,7 @@ type (
 	}
 
 	LoginService interface {
-		Login(context.Context, LoginInput) (LoginOutput, error)
+		Login(context.Context, LoginInput) (*LoginOutput, error)
 	}
 
 	LoginServiceImpl struct {
@@ -38,7 +38,7 @@ func NewLoginServiceImpl(userRepo userpkg.UserRepository, presenter LoginPresent
 	return &LoginServiceImpl{userRepo, presenter}
 }
 
-func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (LoginOutput, error) {
+func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (*LoginOutput, error) {
 	var user domain.UserModel
 
 	criteria := userpkg.FindCriteria{
@@ -47,20 +47,16 @@ func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (L
 
 	if err := s.userRepo.FindOne(ctx, criteria, &user); err != nil {
 		switch {
-		case stderrors.Is(err, errors.ErrUserNotFound):
-			err = errors.ErrAuthCredentials
+		case errors.Is(err, errs.ErrUserNotFound):
+			err = errs.ErrAuthCredentials
 		}
 
-		return s.presenter.Output(domain.Token{}), err
+		return nil, err
 	}
 
 	if !user.Password.CheckPasswordHash(credentials.Password) {
-		return s.presenter.Output(domain.Token{}), errors.ErrAuthCredentials
+		return nil, errs.ErrAuthCredentials
 	}
 
-	token := domain.Token{
-		Value: "123",
-	}
-
-	return s.presenter.Output(token), nil
+	return s.presenter.Output(ctx, &user)
 }
