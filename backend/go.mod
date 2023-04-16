@@ -7,6 +7,7 @@ require (
 	github.com/emicklei/go-restful-openapi/v2 v2.9.1
 	github.com/emicklei/go-restful/v3 v3.10.2
 	github.com/glebarez/sqlite v1.7.0
+	github.com/golang-jwt/jwt/v5 v5.0.0-rc.2
 	github.com/google/wire v0.5.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo v3.3.5+incompatible
