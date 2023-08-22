@@ -164,3 +164,14 @@ docker-run: docker-deps ## Run docker container for image project
 docker-deps:
 	# docker-compose up -d postgres mongodb-primary mongodb-secondary mongodb-arbiter
 	# sleep 3
+
+.PHONY: podman-build
+podman-build: ## Build container image using podman
+	@echo "Building image \"$(IMAGE_NAME):$(IMAGE_TAG)\" ..."
+	@podman build \
+		--build-arg BUILDKIT_CONTEXT_KEEP_GIT_DIR=1 \
+		--target production \
+		--tag $(IMAGE_NAME):$(IMAGE_TAG) \
+		-f Dockerfile \
+		..
+

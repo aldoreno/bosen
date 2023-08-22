@@ -1,0 +1,48 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bosen-backend
+  labels:
+    app: bosen-backend
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bosen-backend
+  template:
+    metadata:
+      labels:
+        app: bosen-backend
+    spec:
+      containers:
+        - name: bosen-backend
+          image: docker.io/aldoreno/bosen-backend:ce59fe2
+          imagePullPolicy: IfNotPresent
+          args:
+          ports:
+            - name: api
+              containerPort: 8080
+          env:
+            - name: BACKEND_HOST
+              value: "0.0.0.0"
+            - name: BACKEND_PORT
+              value: "8080"
+            # Database
+            - name: BACKEND_PRIMARY_DB_DRIVER
+              value: "postgresql"
+            - name: BACKEND_PRIMARY_DB_HOST
+              value: "postgresql.default.svc.cluster.local"
+            - name: BACKEND_PRIMARY_DB_PORT
+              value: "5432"
+            - name: BACKEND_PRIMARY_DB_TIMEZONE
+              value: "UTC"
+            - name: BACKEND_PRIMARY_DB_NAME
+              value: "cms"
+            - name: BACKEND_PRIMARY_DB_USER
+              value: "cmsuser"
+            - name: BACKEND_PRIMARY_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql
+                  key: password
