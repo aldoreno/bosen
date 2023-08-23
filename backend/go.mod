@@ -13,6 +13,7 @@ require (
 	github.com/labstack/echo v3.3.5+incompatible
 	github.com/lib/pq v0.0.0-20180327071824-d34b9ff171c2
 	github.com/satori/go.uuid v1.2.1-0.20180103174451-36e9d2ebbde5
+	go.opentelemetry.io/otel v1.16.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.6.0
 	gorm.io/driver/postgres v1.5.0
@@ -24,6 +25,8 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.20.3 // indirect
+	github.com/go-logr/logr v1.2.4 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect
@@ -45,6 +48,8 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230126093431-47fa9a501578 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
+	go.opentelemetry.io/otel/metric v1.16.0 // indirect
+	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/net v0.6.0 // indirect

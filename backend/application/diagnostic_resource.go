@@ -6,6 +6,7 @@ import (
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
+	"go.opentelemetry.io/otel"
 )
 
 type DiagnosticResource struct{}
@@ -31,5 +32,7 @@ func (r *DiagnosticResource) WebService() *restful.WebService {
 }
 
 func (r *DiagnosticResource) manifest(req *restful.Request, resp *restful.Response) {
+	_, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), "DiagnosticResource.manifest")
+	defer span.End()
 	resp.WriteAsJson(manifest.Info())
 }

@@ -1,11 +1,13 @@
 package user
 
 import (
+	"bosen/manifest"
 	"bosen/pkg/domain"
 	errs "bosen/pkg/errors"
 	"context"
 	"errors"
 
+	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -41,6 +43,9 @@ func (c FindCriteria) Map() map[string]any {
 }
 
 func (r *UserRepositoryImpl) FindOne(ctx context.Context, criteria FindCriteria, user *domain.UserModel) error {
+	_, span := otel.Tracer(manifest.AppName).Start(ctx, "UserRepository.FindOne")
+	defer span.End()
+
 	result := r.db.Model(user).Where(criteria.Map()).First(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {

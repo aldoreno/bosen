@@ -1,11 +1,14 @@
 package login
 
 import (
+	"bosen/manifest"
 	"bosen/pkg/domain"
 	errs "bosen/pkg/errors"
 	userpkg "bosen/pkg/user"
 	"context"
 	"errors"
+
+	"go.opentelemetry.io/otel"
 )
 
 var _ LoginService = (*LoginServiceImpl)(nil)
@@ -39,6 +42,9 @@ func NewLoginServiceImpl(userRepo userpkg.UserRepository, presenter LoginPresent
 }
 
 func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (*LoginOutput, error) {
+	ctx, span := otel.Tracer(manifest.AppName).Start(ctx, "LoginService.Login")
+	defer span.End()
+
 	var user domain.UserModel
 
 	criteria := userpkg.FindCriteria{

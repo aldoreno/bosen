@@ -1,12 +1,14 @@
 package login
 
 import (
+	"bosen/manifest"
 	errs "bosen/pkg/errors"
 	"bosen/pkg/response"
 	"errors"
 	"net/http"
 
 	restful "github.com/emicklei/go-restful/v3"
+	"go.opentelemetry.io/otel"
 )
 
 // Adapter-level code to specifically handle HTTP requests.
@@ -21,13 +23,16 @@ func NewLoginAction(svc LoginService) *LoginAction {
 }
 
 func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
+	ctx, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), "LoginAction.Handler")
+	defer span.End()
+
 	var input LoginInput
 	if err := req.ReadEntity(&input); err != nil {
 		response.WriteError(res, http.StatusBadRequest, err, restful.MIME_JSON)
 		return
 	}
 
-	output, err := a.svc.Login(req.Request.Context(), input)
+	output, err := a.svc.Login(ctx, input)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrAuthCredentials):
