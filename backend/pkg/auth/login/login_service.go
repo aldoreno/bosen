@@ -4,6 +4,7 @@ import (
 	"bosen/manifest"
 	"bosen/pkg/domain"
 	errs "bosen/pkg/errors"
+	"bosen/pkg/runtime"
 	userpkg "bosen/pkg/user"
 	"context"
 	"errors"
@@ -42,7 +43,7 @@ func NewLoginServiceImpl(userRepo userpkg.UserRepository, presenter LoginPresent
 }
 
 func (s *LoginServiceImpl) Login(ctx context.Context, credentials LoginInput) (*LoginOutput, error) {
-	ctx, span := otel.Tracer(manifest.AppName).Start(ctx, "LoginService.Login")
+	ctx, span := otel.Tracer(manifest.AppName).Start(ctx, runtime.GetCurrentFunctionName())
 	defer span.End()
 
 	var user domain.UserModel

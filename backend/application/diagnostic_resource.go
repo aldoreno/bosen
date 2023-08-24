@@ -2,6 +2,7 @@ package application
 
 import (
 	"bosen/manifest"
+	"bosen/pkg/runtime"
 	"net/http"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
@@ -32,7 +33,7 @@ func (r *DiagnosticResource) WebService() *restful.WebService {
 }
 
 func (r *DiagnosticResource) manifest(req *restful.Request, resp *restful.Response) {
-	_, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), "DiagnosticResource.manifest")
+	_, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), runtime.GetCurrentFunctionName())
 	defer span.End()
 	resp.WriteAsJson(manifest.Info())
 }

@@ -4,6 +4,7 @@ import (
 	"bosen/manifest"
 	"bosen/pkg/domain"
 	errs "bosen/pkg/errors"
+	"bosen/pkg/runtime"
 	"context"
 	"errors"
 
@@ -43,7 +44,7 @@ func (c FindCriteria) Map() map[string]any {
 }
 
 func (r *UserRepositoryImpl) FindOne(ctx context.Context, criteria FindCriteria, user *domain.UserModel) error {
-	_, span := otel.Tracer(manifest.AppName).Start(ctx, "UserRepository.FindOne")
+	_, span := otel.Tracer(manifest.AppName).Start(ctx, runtime.GetCurrentFunctionName())
 	defer span.End()
 
 	result := r.db.Model(user).Where(criteria.Map()).First(user)

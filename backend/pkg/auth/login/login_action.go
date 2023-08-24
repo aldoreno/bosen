@@ -4,6 +4,7 @@ import (
 	"bosen/manifest"
 	errs "bosen/pkg/errors"
 	"bosen/pkg/response"
+	"bosen/pkg/runtime"
 	"errors"
 	"net/http"
 
@@ -23,7 +24,7 @@ func NewLoginAction(svc LoginService) *LoginAction {
 }
 
 func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
-	ctx, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), "LoginAction.Handler")
+	ctx, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), runtime.GetCurrentFunctionName())
 	defer span.End()
 
 	var input LoginInput
