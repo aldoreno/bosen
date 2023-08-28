@@ -9,10 +9,11 @@ import (
 )
 
 type Config struct {
-	Host      string            `envconfig:"host"`
-	Port      string            `envconfig:"port"`
-	JWTSecret string            `envconfig:"jwt_secret"`
-	Database  database.DbConfig `envconfig:"primary_db"`
+	Host         string            `envconfig:"host"`
+	Port         string            `envconfig:"port"`
+	JWTSecret    string            `envconfig:"jwt_secret"`
+	Database     database.DbConfig `envconfig:"primary_db"`
+	OtlpGrpcAddr string            `envconfig:"otlp_grpc_address"`
 }
 
 var cfg *Config

@@ -165,6 +165,16 @@ docker-deps:
 	# docker-compose up -d postgres mongodb-primary mongodb-secondary mongodb-arbiter
 	# sleep 3
 
+.PHONY: podman-start
+podman-start: ## Start podman default machine
+	@echo "Starting default podman machine ..."
+	@podman machine start
+
+.PHONY: podman-stop
+podman-stop: ## Stop podman default machine
+	@echo "Stopping default podman machine ..."
+	@podman machine stop
+
 .PHONY: podman-build
 podman-build: ## Build container image using podman
 	@echo "Building image \"$(IMAGE_NAME):$(IMAGE_TAG)\" ..."
@@ -175,3 +185,8 @@ podman-build: ## Build container image using podman
 		-f Dockerfile \
 		..
 
+.PHONY: podman-push
+podman-push: ## Push container image to image repository
+	@echo "Push latest container image to image repository ..."
+	@echo "TODO: fix container image tag"
+	#@podman push docker.io/aldoreno/bosen-backend:3ebe1d3
