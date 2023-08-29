@@ -1,0 +1,58 @@
+otelcol.receiver.otlp "default" {
+	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.receiver.otlp/
+
+	// configures the default grpc endpoint "0.0.0.0:4317"
+	grpc { }
+	// configures the default http/protobuf endpoint "0.0.0.0:4318"
+	http { }
+
+	output {
+		traces  = [otelcol.processor.batch.default.input]
+	}
+}
+
+otelcol.processor.batch "default" {
+	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.processor.batch/
+	output {
+		traces  = [
+			otelcol.exporter.otlp.grafana_apm_tempo.input,
+			otelcol.exporter.otlp.grafana_cloud_tempo.input,
+		]
+	}
+}
+
+otelcol.exporter.otlp "grafana_apm_tempo" {
+	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.exporter.otlp/
+	client {
+		endpoint = env("GRAFANA_APM_TEMPO_ENDPOINT")
+
+		// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.auth.headers/#example
+		auth     = otelcol.auth.headers.grafana_apm_tempo.handler
+
+		tls {
+			insecure = true
+			insecure_skip_verify = true
+		}
+	}
+}
+
+otelcol.auth.headers "grafana_apm_tempo" {
+	header {
+		key = "X-Scope-OrgID"
+		value = "otelcol-cluster-staging"
+	}
+}
+
+otelcol.exporter.otlp "grafana_cloud_tempo" {
+	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.exporter.otlp/
+	client {
+		endpoint = env("GRAFANA_CLOUD_TEMPO_ENDPOINT")
+		auth     = otelcol.auth.basic.grafana_cloud_tempo.handler
+	}
+}
+
+otelcol.auth.basic "grafana_cloud_tempo" {
+	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.auth.basic/
+	username = env("GRAFANA_CLOUD_TEMPO_USERNAME")
+	password = env("GRAFANA_CLOUD_API_KEY")
+}
