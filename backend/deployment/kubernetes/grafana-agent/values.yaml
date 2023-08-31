@@ -59,6 +59,11 @@ agent:
 
   # -- Extra environment variables to pass to the agent container.
   extraEnv:
+    - name: GRAFANA_APM_TEMPO_ENDPOINT
+      valueFrom:
+        secretKeyRef:
+          name: lgtm-credentials
+          key: GRAFANA_APM_TEMPO_ENDPOINT
     - name: GRAFANA_CLOUD_TEMPO_ENDPOINT
       valueFrom:
         secretKeyRef:
@@ -69,16 +74,26 @@ agent:
         secretKeyRef:
           name: lgtm-credentials
           key: GRAFANA_CLOUD_TEMPO_USERNAME
-    - name: GRAFANA_CLOUD_API_KEY
+    - name: GRAFANA_CLOUD_TEMPO_API_KEY
       valueFrom:
         secretKeyRef:
           name: lgtm-credentials
-          key: GRAFANA_CLOUD_API_KEY
-    - name: GRAFANA_APM_TEMPO_ENDPOINT
+          key: GRAFANA_CLOUD_TEMPO_API_KEY
+    - name: GRAFANA_CLOUD_MIMIR_ENDPOINT
       valueFrom:
         secretKeyRef:
           name: lgtm-credentials
-          key: GRAFANA_APM_TEMPO_ENDPOINT
+          key: GRAFANA_CLOUD_MIMIR_ENDPOINT
+    - name: GRAFANA_CLOUD_MIMIR_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: lgtm-credentials
+          key: GRAFANA_CLOUD_MIMIR_USERNAME
+    - name: GRAFANA_CLOUD_MIMIR_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: lgtm-credentials
+          key: GRAFANA_CLOUD_MIMIR_API_KEY
 
   # -- Maps all the keys on a ConfigMap or Secret as environment variables. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#envfromsource-v1-core
   envFrom: []

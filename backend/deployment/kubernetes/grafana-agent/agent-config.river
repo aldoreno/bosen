@@ -8,6 +8,7 @@ otelcol.receiver.otlp "default" {
 
 	output {
 		traces  = [otelcol.processor.batch.default.input]
+		metrics = [otelcol.processor.batch.default.input]
 	}
 }
 
@@ -17,6 +18,9 @@ otelcol.processor.batch "default" {
 		traces  = [
 			otelcol.exporter.otlp.grafana_apm_tempo.input,
 			otelcol.exporter.otlp.grafana_cloud_tempo.input,
+		]
+		metrics = [
+			otelcol.exporter.prometheus.mimir.input,
 		]
 	}
 }
@@ -54,5 +58,23 @@ otelcol.exporter.otlp "grafana_cloud_tempo" {
 otelcol.auth.basic "grafana_cloud_tempo" {
 	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.auth.basic/
 	username = env("GRAFANA_CLOUD_TEMPO_USERNAME")
-	password = env("GRAFANA_CLOUD_API_KEY")
+	password = env("GRAFANA_CLOUD_TEMPO_API_KEY")
+}
+
+otelcol.exporter.prometheus "mimir" {
+	forward_to = [
+		// prometheus.remote_write.grafana_apm_mimir.receiver,
+		prometheus.remote_write.grafana_cloud_mimir.receiver,
+	]
+}
+
+prometheus.remote_write "grafana_cloud_mimir" {
+	endpoint {
+		url = env("GRAFANA_CLOUD_MIMIR_ENDPOINT")
+		
+		basic_auth {
+			username = env("GRAFANA_CLOUD_MIMIR_USERNAME")
+			password = env("GRAFANA_CLOUD_MIMIR_API_KEY")
+		}
+	}
 }
