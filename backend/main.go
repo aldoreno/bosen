@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	sglog "github.com/sourcegraph/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -25,6 +26,31 @@ import (
 
 func main() {
 	log.InitGlobalLogger()
+
+	liblog := sglog.Init(sglog.Resource{
+		Name: manifest.AppName,
+	})
+	defer liblog.Sync()
+
+	backend := sglog.Scoped("bosen-backend", "main function")
+	l := backend.Scoped("main", "main function")
+
+	// print diagnostics
+	config := []sglog.Field{}
+	for _, k := range []string{
+		sglog.EnvDevelopment,
+		sglog.EnvLogFormat,
+		sglog.EnvLogLevel,
+		sglog.EnvLogScopeLevel,
+		sglog.EnvLogSamplingInitial,
+		sglog.EnvLogSamplingThereafter,
+	} {
+		config = append(config, sglog.String(k, os.Getenv(k)))
+	}
+	l.Info("configuration", config...)
+
+	// sample message
+	l.Warn("hello world!", sglog.Time("now", time.Now()))
 
 	ctx := context.Background()
 	shutdown, err := newTraceProvider(ctx)
