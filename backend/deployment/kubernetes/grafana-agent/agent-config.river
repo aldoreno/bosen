@@ -1,3 +1,8 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
 otelcol.receiver.otlp "default" {
 	// https://grafana.com/docs/agent/latest/flow/reference/components/otelcol.receiver.otlp/
 
@@ -63,9 +68,18 @@ otelcol.auth.basic "grafana_cloud_tempo" {
 
 otelcol.exporter.prometheus "mimir" {
 	forward_to = [
-		// prometheus.remote_write.grafana_apm_mimir.receiver,
+		prometheus.remote_write.grafana_apm_mimir.receiver,
 		prometheus.remote_write.grafana_cloud_mimir.receiver,
 	]
+}
+
+prometheus.remote_write "grafana_apm_mimir" {
+	endpoint {
+		url = env("GRAFANA_APM_MIMIR_ENDPOINT")
+		headers = {
+			"X-Scope-OrgID" = "otelcol-cluster-staging",
+		}
+	}
 }
 
 prometheus.remote_write "grafana_cloud_mimir" {
@@ -84,7 +98,10 @@ prometheus.scrape "grafana_agents" {
 		{"__address__" = "localhost:80"},
 	]
 
-	forward_to = [prometheus.remote_write.grafana_cloud_mimir.receiver]
+	forward_to = [
+		prometheus.remote_write.grafana_apm_mimir.receiver,
+		prometheus.remote_write.grafana_cloud_mimir.receiver,
+	]
 }
 
 // --------
@@ -94,6 +111,11 @@ discovery.kubernetes "k8s" {
 
   // Limit searched k8s pods by its namespace
   // src: https://grafana.com/docs/agent/latest/flow/reference/components/discovery.kubernetes/#limit-searched-namespaces-and-filter-by-labels-value
+  selectors {
+    role = "pod"
+    label = "app=bosen-backend"
+  }
+
   namespaces {
 	names = ["default"]
   }
@@ -103,7 +125,13 @@ discovery.relabel "k8s" {
   targets = discovery.kubernetes.k8s.targets
 
   rule {
-    source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_label_name"]
+    // discovery.kubernetes component's pod role produces many labels
+    // see: https://grafana.com/docs/agent/latest/flow/reference/components/discovery.kubernetes/#pod-role
+    // following are 2 of many:
+    // 1. __meta_kubernetes_namespace: The namespace of the pod object.
+    // 2. __meta_kubernetes_pod_label_<labelname>: Each label from the pod object.
+    // basically we are mapping: job=<pod.namespace>/<pod.label.name>
+    source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_label_app"]
     target_label  = "job"
     separator     = "/"
   }
