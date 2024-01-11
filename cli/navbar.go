@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/rivo/tview"
 )
 
@@ -20,7 +19,7 @@ var items = []NavbarItem{
 		description: "",
 		shortcut:    0,
 		onClick: func() {
-			fmt.Println("VPN navbar item clicked")
+			Log("VPN navbar item clicked")
 		},
 	},
 	{
@@ -28,7 +27,7 @@ var items = []NavbarItem{
 		description: "",
 		shortcut:    0,
 		onClick: func() {
-			fmt.Println("Database navbar item clicked")
+			Log("Database navbar item clicked")
 		},
 	},
 }

@@ -49,10 +49,7 @@ func setup(app *tview.Application) {
 		AddItem(databases, 0, 40, false).
 		AddItem(placeholder, 0, 50, false)
 
-	debugger = tview.NewList()
-	debugger.
-		SetBorder(true).
-		SetTitle("Debugger")
+	debugger = NewDebugger() 
 
 	// Create the layout
 	layout := tview.NewFlex().
