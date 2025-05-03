@@ -22,6 +22,21 @@ func WithLogger() Option {
 	}
 }
 
+// NOTE: logger should be configured the earliest
+func WithLoggerOld() Option {
+	return func(_ *Application) {
+		stdlog.Println("setting up logger")
+
+		logger, err := zap.NewDevelopment()
+		if err != nil {
+			stdlog.Fatalf("unable to instantiate zap development logger %s", err)
+		}
+
+		zap.ReplaceGlobals(logger)
+		zap.S().Info("logger set")
+	}
+}
+
 func WithConfig(cfg Config) Option {
 	return func(a *Application) {
 		a.config = cfg

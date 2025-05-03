@@ -14,6 +14,11 @@ import (
 	"github.com/google/wire"
 )
 
+func InjectLogger() application.Config {
+	wire.Build(application.ProvideConfig)
+	return application.Config{}
+}
+
 func InjectConfig() application.Config {
 	wire.Build(application.ProvideConfig)
 	return application.Config{}

@@ -40,8 +40,8 @@ wire_gen.go: wire.go ## Generate dependency injection
 build: clean wire_gen.go ## Build golang project
 	@echo "Compiling ..."
 	CGO_ENABLED=1 go build \
-		-v -race \
-		-tags jsoniter \
+		-v \
+		-o ./bin/$(APP_NAME) \
 		-ldflags="\
 			-X \"bosen/manifest.AppName=$(APP_NAME)\" \
 			-X \"bosen/manifest.AppVersion=$(APP_VERSION)\" \
@@ -49,13 +49,14 @@ build: clean wire_gen.go ## Build golang project
 			-X \"bosen/manifest.CommitMsg=$(COMMIT_MSG)\" \
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
-		-o bin/$(APP_NAME) \
 		$(ENTRYPOINT)
+		# -race \
+		# -tags jsoniter \
+
 
 .PHONY: run
 run: wire_gen.go ## Run golang project
 	go run \
-		-tags=jsoniter \
 		-ldflags="\
 			-X \"bosen/manifest.AppName=$(APP_NAME)\" \
 			-X \"bosen/manifest.AppVersion=$(APP_VERSION)\" \
@@ -64,6 +65,7 @@ run: wire_gen.go ## Run golang project
 			-X \"bosen/manifest.CommitHash=$(COMMIT_HASH)\" \
 			-X \"bosen/manifest.ReleaseVersion=$(BUILD_TAG)\"" \
 		$(ENTRYPOINT)
+		# -tags=jsoniter \
 
 .PHONY: watch
 watch: wire_gen.go ## Run golang project

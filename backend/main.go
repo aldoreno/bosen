@@ -11,7 +11,6 @@ import (
 	"os"
 	"time"
 
-	sglog "github.com/sourcegraph/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -25,61 +24,44 @@ import (
 )
 
 func main() {
-	log.InitGlobalLogger()
+	// log.InitGlobalLogger()
 
-	liblog := sglog.Init(sglog.Resource{
-		Name: manifest.AppName,
-	})
-	defer liblog.Sync()
+	backend, sync := log.Logger()
+	defer sync()
 
-	backend := sglog.Scoped("bosen-backend", "main function")
-	l := backend.Scoped("main", "main function")
+	// l := backend.Scoped("Main", "Entrypoint for the REST API")
 
-	// print diagnostics
-	config := []sglog.Field{}
-	for _, k := range []string{
-		sglog.EnvDevelopment,
-		sglog.EnvLogFormat,
-		sglog.EnvLogLevel,
-		sglog.EnvLogScopeLevel,
-		sglog.EnvLogSamplingInitial,
-		sglog.EnvLogSamplingThereafter,
-	} {
-		config = append(config, sglog.String(k, os.Getenv(k)))
-	}
-	l.Info("configuration", config...)
+	shutdown := newStdoutExporterTracerProvider()
+	defer shutdown()
 
-	// sample message
-	l.Warn("hello world!", sglog.Time("now", time.Now()))
-
-	ctx := context.Background()
-	shutdown, err := newTraceProvider(ctx)
-	if err != nil {
-		stdlog.Fatal(err)
-	}
-	defer func(ctx context.Context) {
-		if err := shutdown(ctx); err != nil {
-			stdlog.Fatal("failed to shutdown TracerProvider: %w", err)
-		}
-	}(ctx)
+	// ctx := context.Background()
+	// shutdown, err := newTraceProvider(ctx)
+	// if err != nil {
+	// 	stdlog.Fatal(err)
+	// }
+	// defer func(ctx context.Context) {
+	// 	if err := shutdown(ctx); err != nil {
+	// 		stdlog.Fatal("failed to shutdown TracerProvider: %w", err)
+	// 	}
+	// }(ctx)
 
 	app := application.NewApplication(
+		application.WithLogger(InjectLogger()),
 		application.WithConfig(InjectConfig()),
 		application.WithContainer(InjectContainer()),
 		application.WithResource(InjectDiagnosticResource()),
-		application.WithResource(InjectAuthResource()),
+		// application.WithResource(InjectAuthResource()),
 	)
 
 	stdlog.Fatal(app.Start(context.Background()))
 }
 
-func newStdoutExporterTracerProvider() {
+func newStdoutExporterTracerProvider() func() {
 	// Write telemetry data to a file
 	f, err := os.Create("traces.txt")
 	if err != nil {
 		stdlog.Fatal(err)
 	}
-	defer f.Close()
 
 	exporter, err := newExporter(f)
 	if err != nil {
@@ -90,12 +72,16 @@ func newStdoutExporterTracerProvider() {
 		trace.WithBatcher(exporter),
 		trace.WithResource(newResource()),
 	)
-	defer func() {
+
+	otel.SetTracerProvider(traceProvider)
+
+	return func() {
+		f.Close()
+
 		if err := traceProvider.Shutdown(context.Background()); err != nil {
 			stdlog.Fatal(err)
 		}
-	}()
-	otel.SetTracerProvider(traceProvider)
+	}
 }
 
 func newTraceProvider(ctx context.Context) (func(context.Context) error, error) {
