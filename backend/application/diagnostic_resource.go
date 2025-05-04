@@ -7,13 +7,18 @@ import (
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
+	sglog "github.com/sourcegraph/log"
 	"go.opentelemetry.io/otel"
 )
 
-type DiagnosticResource struct{}
+type DiagnosticResource struct {
+	log sglog.Logger
+}
 
 func NewDiagnosticResource() *DiagnosticResource {
-	return &DiagnosticResource{}
+	return &DiagnosticResource{
+		log: sglog.Scoped("application.DiagnosticResource", "provides build time information of the application"),
+	}
 }
 
 func (r *DiagnosticResource) WebService() *restful.WebService {
@@ -35,5 +40,9 @@ func (r *DiagnosticResource) WebService() *restful.WebService {
 func (r *DiagnosticResource) manifest(req *restful.Request, resp *restful.Response) {
 	_, span := otel.Tracer(manifest.AppName).Start(req.Request.Context(), runtime.GetCurrentFunctionName())
 	defer span.End()
+
+	r.log.Info("diagnostic resource called")
 	resp.WriteAsJson(manifest.Info())
 }
+
+/* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

@@ -5,7 +5,6 @@ package main
 
 import (
 	"bosen/application"
-	"bosen/log"
 	"bosen/pkg/auth"
 	"bosen/pkg/auth/login"
 	"bosen/pkg/database"
@@ -13,14 +12,7 @@ import (
 
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/wire"
-	sglog "github.com/sourcegraph/log"
 )
-
-func InjectLogger() (sglog.Logger, func()) {
-	wire.Build(log.Logger)
-	// wire.Bind(new(sglog.Logger), new(*user.UserRepositoryImpl)),
-	return new(sglog.Logger), func() {}
-}
 
 func InjectConfig() application.Config {
 	wire.Build(application.ProvideConfig)
@@ -85,3 +77,5 @@ func InjectAuthResource() *auth.AuthResource {
 	wire.Build(AuthResourceSet)
 	return &auth.AuthResource{}
 }
+
+/* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

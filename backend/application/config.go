@@ -3,9 +3,10 @@ package application
 import (
 	"bosen/pkg/database"
 	"fmt"
+	stdlog "log"
 
 	"github.com/kelseyhightower/envconfig"
-	"go.uber.org/zap"
+	sglog "github.com/sourcegraph/log"
 )
 
 type Config struct {
@@ -23,18 +24,18 @@ func GetConfig() *Config {
 		return cfg
 	}
 
-	zap.S().Info("populating configuration from env variables")
+	log := sglog.Scoped("application.Config", "application config")
+	log.Info("populating configuration from env variables")
 
 	var temp Config
 	err := envconfig.Process("backend", &temp)
 	if err != nil {
-		// stdlog.Fatal(fmt.Errorf("unable to process env variables: [%s]", err))
-		zap.S().Fatal(fmt.Errorf("unable to process env variables: [%s]", err))
+		stdlog.Fatal(fmt.Errorf("unable to process env variables: [%s]", err))
 		return nil
 	}
 
 	cfg = &temp
-	// zap.S().Infof("loaded configuration: %+v", cfg)
+	log.Debug(fmt.Sprintf("loaded configuration: %+v", cfg))
 
 	return cfg
 }
@@ -43,3 +44,5 @@ func ProvideConfig() Config {
 	cfg := GetConfig()
 	return *cfg
 }
+
+/* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

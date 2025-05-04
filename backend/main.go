@@ -2,7 +2,6 @@ package main
 
 import (
 	"bosen/application"
-	"bosen/log"
 	"bosen/manifest"
 	"context"
 	"fmt"
@@ -25,16 +24,13 @@ import (
 )
 
 func main() {
-	// log.InitGlobalLogger()
+	liblog := sglog.Init(sglog.Resource{
+		Name: manifest.AppName,
+	})
+	defer liblog.Sync()
 
-	// logger, sync := log.Logger()
-	logger, sync := InjectLogger()
-	defer sync()
-
-	l := logger.Scoped("Main", "Entrypoint for the REST API")
-
-	// sample message
-	l.Warn("hello world!", sglog.Time("now", time.Now()))
+	log := sglog.Scoped("main", "entrypoint for the rest api")
+	log.Warn("application started", sglog.Time("now", time.Now()))
 
 	shutdown := newStdoutExporterTracerProvider()
 	defer shutdown()
@@ -51,7 +47,6 @@ func main() {
 	// }(ctx)
 
 	app := application.NewApplication(
-		// application.WithLogger(InjectLogger()),
 		application.WithConfig(InjectConfig()),
 		application.WithContainer(InjectContainer()),
 		application.WithResource(InjectDiagnosticResource()),
@@ -148,3 +143,5 @@ func newResource() *resource.Resource {
 	)
 	return r
 }
+
+/* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

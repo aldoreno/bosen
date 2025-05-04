@@ -1,12 +1,10 @@
 package log
 
 import (
-	stdlog "log"
-	"os"
-
-	"bosen/manifest"
 	sglog "github.com/sourcegraph/log"
 	"go.uber.org/zap"
+	stdlog "log"
+	"os"
 )
 
 func InitGlobalLogger() {
@@ -19,21 +17,10 @@ func InitGlobalLogger() {
 	zap.S().Info("logger set")
 }
 
-func ProvideLogger() *sglog.PostInitCallbacks {
-	return sglog.Init(sglog.Resource{
-		Name: manifest.AppName,
-	})
-}
+func Info() {
+	log := sglog.Scoped("Log", "log component")
 
-func Logger() (sglog.Logger, func()) {
-	liblog := sglog.Init(sglog.Resource{
-		Name: manifest.AppName,
-	})
-
-	logger := sglog.Scoped("BosenBackend", "REST API of bosen app")
-	// l := backend.Scoped("Main", "Entrypoint for the REST API")
-
-	// print diagnostics
+	// print sourcegraph log environment variables
 	config := []sglog.Field{}
 	for _, k := range []string{
 		sglog.EnvDevelopment,
@@ -45,7 +32,5 @@ func Logger() (sglog.Logger, func()) {
 	} {
 		config = append(config, sglog.String(k, os.Getenv(k)))
 	}
-	logger.Info("log configuration", config...)
-
-	return logger, liblog.Sync
+	log.Info("sglog env vars", config...)
 }
