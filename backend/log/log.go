@@ -3,7 +3,6 @@ package log
 import (
 	stdlog "log"
 	"os"
-	"time"
 
 	"bosen/manifest"
 	sglog "github.com/sourcegraph/log"
@@ -20,13 +19,19 @@ func InitGlobalLogger() {
 	zap.S().Info("logger set")
 }
 
+func ProvideLogger() *sglog.PostInitCallbacks {
+	return sglog.Init(sglog.Resource{
+		Name: manifest.AppName,
+	})
+}
+
 func Logger() (sglog.Logger, func()) {
 	liblog := sglog.Init(sglog.Resource{
 		Name: manifest.AppName,
 	})
 
-	backend := sglog.Scoped("BosenBackend", "REST API of bosen app")
-	l := backend.Scoped("Main", "Entrypoint for the REST API")
+	logger := sglog.Scoped("BosenBackend", "REST API of bosen app")
+	// l := backend.Scoped("Main", "Entrypoint for the REST API")
 
 	// print diagnostics
 	config := []sglog.Field{}
@@ -40,10 +45,7 @@ func Logger() (sglog.Logger, func()) {
 	} {
 		config = append(config, sglog.String(k, os.Getenv(k)))
 	}
-	l.Info("log configuration", config...)
+	logger.Info("log configuration", config...)
 
-	// sample message
-	l.Warn("hello world!", sglog.Time("now", time.Now()))
-
-	return backend, liblog.Sync
+	return logger, liblog.Sync
 }

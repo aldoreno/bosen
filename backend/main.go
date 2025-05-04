@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	sglog "github.com/sourcegraph/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -26,10 +27,14 @@ import (
 func main() {
 	// log.InitGlobalLogger()
 
-	backend, sync := log.Logger()
+	// logger, sync := log.Logger()
+	logger, sync := InjectLogger()
 	defer sync()
 
-	// l := backend.Scoped("Main", "Entrypoint for the REST API")
+	l := logger.Scoped("Main", "Entrypoint for the REST API")
+
+	// sample message
+	l.Warn("hello world!", sglog.Time("now", time.Now()))
 
 	shutdown := newStdoutExporterTracerProvider()
 	defer shutdown()
@@ -46,7 +51,7 @@ func main() {
 	// }(ctx)
 
 	app := application.NewApplication(
-		application.WithLogger(InjectLogger()),
+		// application.WithLogger(InjectLogger()),
 		application.WithConfig(InjectConfig()),
 		application.WithContainer(InjectContainer()),
 		application.WithResource(InjectDiagnosticResource()),

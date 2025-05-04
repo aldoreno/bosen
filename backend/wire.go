@@ -5,6 +5,7 @@ package main
 
 import (
 	"bosen/application"
+	"bosen/log"
 	"bosen/pkg/auth"
 	"bosen/pkg/auth/login"
 	"bosen/pkg/database"
@@ -12,11 +13,13 @@ import (
 
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/wire"
+	sglog "github.com/sourcegraph/log"
 )
 
-func InjectLogger() application.Config {
-	wire.Build(application.ProvideConfig)
-	return application.Config{}
+func InjectLogger() (sglog.Logger, func()) {
+	wire.Build(log.Logger)
+	// wire.Bind(new(sglog.Logger), new(*user.UserRepositoryImpl)),
+	return new(sglog.Logger), func() {}
 }
 
 func InjectConfig() application.Config {
