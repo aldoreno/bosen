@@ -56,6 +56,7 @@ build: clean wire_gen.go ## Build golang project
 
 .PHONY: run
 run: wire_gen.go ## Run golang project
+	SRC_DEVELOPMENT=false \
 	SRC_LOG_LEVEL=info \
 	go run \
 		-ldflags="\
@@ -194,4 +195,3 @@ podman-push: ## Push container image to image repository
 	@echo "TODO: fix container image tag"
 	#@podman push docker.io/aldoreno/bosen-backend:3ebe1d3
 
-/* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

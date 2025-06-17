@@ -25,7 +25,8 @@ import (
 
 func main() {
 	liblog := sglog.Init(sglog.Resource{
-		Name: manifest.AppName,
+		Name:    manifest.AppName,
+		Version: manifest.CommitHash,
 	})
 	defer liblog.Sync()
 
