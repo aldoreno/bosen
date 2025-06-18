@@ -3,9 +3,11 @@ package application
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/emicklei/go-restful/v3"
 	sglog "github.com/sourcegraph/log"
-	"net/http"
 )
 
 type Process interface {
@@ -24,12 +26,14 @@ type Application struct {
 type Option func(*Application)
 
 func NewApplication(opts ...Option) *Application {
-	app := &Application{
-		log: sglog.Scoped("application.Application", "application as the container"),
-	}
+	app := &Application{}
 
 	for _, opt := range opts {
 		opt(app)
+	}
+
+	if app.log == nil {
+		log.Fatal("application logger is required")
 	}
 
 	return app
@@ -45,7 +49,7 @@ func (a *Application) Start(ctx context.Context) error {
 
 	// TODO: see labstack's echo implementation on starting http server
 	// to be able to listen prior logging
-	a.log.Info("http server started on %s", sglog.String("server_address", a.server.Addr))
+	a.log.Info("http server started", sglog.String("server_address", a.server.Addr))
 
 	return a.server.ListenAndServe()
 }

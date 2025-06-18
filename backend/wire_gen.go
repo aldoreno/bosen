@@ -8,18 +8,26 @@ package main
 
 import (
 	"bosen/application"
+	log2 "bosen/log"
 	"bosen/pkg/auth"
 	"bosen/pkg/auth/login"
 	"bosen/pkg/database"
 	"bosen/pkg/user"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/wire"
+	"github.com/sourcegraph/log"
 )
 
 // Injectors from wire.go:
 
+func InjectLogger() log.Logger {
+	logger := log2.ProvideLogger()
+	return logger
+}
+
 func InjectConfig() application.Config {
-	config := application.ProvideConfig()
+	logger := InjectLogger()
+	config := application.ProvideConfig(logger)
 	return config
 }
 
@@ -35,7 +43,8 @@ func InjectContainer() *restful.Container {
 }
 
 func InjectDiagnosticResource() *application.DiagnosticResource {
-	diagnosticResource := application.NewDiagnosticResource()
+	logger := InjectLogger()
+	diagnosticResource := application.NewDiagnosticResource(logger)
 	return diagnosticResource
 }
 

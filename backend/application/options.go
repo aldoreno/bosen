@@ -1,39 +1,14 @@
 package application
 
 import (
-	stdlog "log"
-
 	"github.com/emicklei/go-restful/v3"
-	"go.uber.org/zap"
+	sglog "github.com/sourcegraph/log"
 )
 
 // NOTE: logger should be configured the earliest
-func WithLogger() Option {
-	return func(_ *Application) {
-		stdlog.Println("setting up logger")
-
-		logger, err := zap.NewDevelopment()
-		if err != nil {
-			stdlog.Fatalf("unable to instantiate zap development logger %s", err)
-		}
-
-		zap.ReplaceGlobals(logger)
-		zap.S().Info("logger set")
-	}
-}
-
-// NOTE: logger should be configured the earliest
-func WithLoggerOld() Option {
-	return func(_ *Application) {
-		stdlog.Println("setting up logger")
-
-		logger, err := zap.NewDevelopment()
-		if err != nil {
-			stdlog.Fatalf("unable to instantiate zap development logger %s", err)
-		}
-
-		zap.ReplaceGlobals(logger)
-		zap.S().Info("logger set")
+func WithLogger(logger sglog.Logger) Option {
+	return func(a *Application) {
+		a.log = logger.Scoped("application", "main application")
 	}
 }
 
@@ -58,3 +33,5 @@ func WithResource(resource Resource) Option {
 		a.container.Add(resource.WebService())
 	}
 }
+
+/* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

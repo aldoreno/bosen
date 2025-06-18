@@ -19,12 +19,12 @@ type Config struct {
 
 var cfg *Config
 
-func GetConfig() *Config {
+func GetConfig(log sglog.Logger) *Config {
 	if cfg != nil {
 		return cfg
 	}
 
-	log := sglog.Scoped("application.Config", "application config")
+	log = log.Scoped("config", "application config")
 	log.Info("populating configuration from env variables")
 
 	var temp Config
@@ -40,8 +40,8 @@ func GetConfig() *Config {
 	return cfg
 }
 
-func ProvideConfig() Config {
-	cfg := GetConfig()
+func ProvideConfig(log sglog.Logger) Config {
+	cfg := GetConfig(log)
 	return *cfg
 }
 

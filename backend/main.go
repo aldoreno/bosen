@@ -2,6 +2,7 @@ package main
 
 import (
 	"bosen/application"
+	"bosen/log"
 	"bosen/manifest"
 	"context"
 	"fmt"
@@ -24,14 +25,11 @@ import (
 )
 
 func main() {
-	liblog := sglog.Init(sglog.Resource{
-		Name:    manifest.AppName,
-		Version: manifest.CommitHash,
-	})
+	liblog := log.InitLogger()
 	defer liblog.Sync()
 
 	log := sglog.Scoped("main", "entrypoint for the rest api")
-	log.Warn("application started", sglog.Time("now", time.Now()))
+	log.Warn("application starting", sglog.Time("now", time.Now()))
 
 	shutdown := newStdoutExporterTracerProvider()
 	defer shutdown()
@@ -48,6 +46,7 @@ func main() {
 	// }(ctx)
 
 	app := application.NewApplication(
+		application.WithLogger(InjectLogger()),
 		application.WithConfig(InjectConfig()),
 		application.WithContainer(InjectContainer()),
 		application.WithResource(InjectDiagnosticResource()),
@@ -92,7 +91,10 @@ func newTraceProvider(ctx context.Context) (func(context.Context) error, error) 
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	conn, err := grpc.DialContext(ctx, application.GetConfig().OtlpGrpcAddr,
+	config := InjectConfig()
+
+	conn, err := grpc.DialContext(ctx,
+		config.OtlpGrpcAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 	)

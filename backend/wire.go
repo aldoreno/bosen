@@ -5,6 +5,7 @@ package main
 
 import (
 	"bosen/application"
+	"bosen/log"
 	"bosen/pkg/auth"
 	"bosen/pkg/auth/login"
 	"bosen/pkg/database"
@@ -12,10 +13,16 @@ import (
 
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/wire"
+	sglog "github.com/sourcegraph/log"
 )
 
+func InjectLogger() sglog.Logger {
+	wire.Build(log.ProvideLogger)
+	return &log.DummyLogger{}
+}
+
 func InjectConfig() application.Config {
-	wire.Build(application.ProvideConfig)
+	wire.Build(InjectLogger, application.ProvideConfig)
 	return application.Config{}
 }
 
@@ -33,7 +40,10 @@ func InjectContainer() *restful.Container {
 }
 
 func InjectDiagnosticResource() *application.DiagnosticResource {
-	wire.Build(application.NewDiagnosticResource)
+	wire.Build(
+		InjectLogger,
+		application.NewDiagnosticResource,
+	)
 	return &application.DiagnosticResource{}
 }
 
