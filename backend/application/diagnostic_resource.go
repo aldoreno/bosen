@@ -80,7 +80,10 @@ func (r *DiagnosticResource) trace(req *restful.Request, resp *restful.Response)
 	// _span := trace.SpanFromContext(req.Request.Context())
 
 	r.log.Info("/trace called")
-	otelhttp.Get(req.Request.Context(), "http://localhost:8080/manifest.json")
+	res, _ := otelhttp.Get(req.Request.Context(), "http://localhost:8080/manifest.json")
+
+	defer res.Body.Close()
+
 }
 
 /* vim: set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab: */

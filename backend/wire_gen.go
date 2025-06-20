@@ -38,7 +38,7 @@ func InjectDbConfig() database.DbConfig {
 }
 
 func InjectContainer() *restful.Container {
-	container := restful.NewContainer()
+	container := application.ProvideContainer()
 	return container
 }
 

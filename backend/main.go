@@ -12,6 +12,7 @@ import (
 	"time"
 
 	sglog "github.com/sourcegraph/log"
+	"go.opentelemetry.io/contrib/propagators/autoprop"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -67,6 +68,9 @@ func newStdoutExporterTracerProvider() func() {
 	if err != nil {
 		stdlog.Fatal(err)
 	}
+
+	// Configure Context Propagation to use the default W3C traceparent format
+	otel.SetTextMapPropagator(autoprop.NewTextMapPropagator())
 
 	traceProvider := trace.NewTracerProvider(
 		trace.WithBatcher(exporter),

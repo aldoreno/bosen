@@ -35,7 +35,7 @@ func InjectDbConfig() database.DbConfig {
 }
 
 func InjectContainer() *restful.Container {
-	wire.Build(restful.NewContainer)
+	wire.Build(application.ProvideContainer)
 	return &restful.Container{}
 }
 
