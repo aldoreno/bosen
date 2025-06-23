@@ -19,7 +19,7 @@ type DiagnosticResource struct {
 
 func NewDiagnosticResource(log sglog.Logger) *DiagnosticResource {
 	return &DiagnosticResource{
-		log: log.Scoped("diagnosticResource", "provides build time information of the application"),
+		log: log.Scoped("diagnosticResource"),
 	}
 }
 

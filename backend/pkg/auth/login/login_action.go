@@ -27,7 +27,7 @@ func (a LoginAction) Handler(req *restful.Request, res *restful.Response) {
 	span, ctx := trace.New(req.Request.Context(), runtime.GetCurrentFunctionName())
 	defer span.End()
 
-	l := log.Scoped("loginAction", "authentication handler").WithTrace(trace.Context(ctx))
+	l := log.Scoped("loginAction").WithTrace(trace.Context(ctx))
 	l.Info("authentication request received")
 
 	var input LoginInput

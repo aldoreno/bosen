@@ -24,7 +24,7 @@ func GetConfig(log sglog.Logger) *Config {
 		return cfg
 	}
 
-	log = log.Scoped("config", "application config")
+	log = log.Scoped("config")
 	log.Info("populating configuration from env variables")
 
 	var temp Config

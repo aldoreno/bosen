@@ -4,7 +4,9 @@ import (
 	"bosen/application"
 	"bosen/log"
 	"bosen/manifest"
+	"bosen/observability"
 	"context"
+
 	// "fmt"
 	"io"
 	stdlog "log"
@@ -15,6 +17,7 @@ import (
 	"go.opentelemetry.io/contrib/propagators/autoprop"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+
 	// "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	// "go.opentelemetry.io/otel/propagation"
@@ -29,11 +32,18 @@ func main() {
 	liblog := log.InitLogger()
 	defer liblog.Sync()
 
-	log := sglog.Scoped("main", "entrypoint for the rest api")
+	log := sglog.Scoped("main")
 	log.Warn("application starting", sglog.Time("now", time.Now()))
 
-	shutdown := newStdoutExporterTracerProvider()
-	defer shutdown()
+	tracerProvider, _ := observability.InitTracerProvider()
+	defer func() {
+		if err := tracerProvider.Shutdown(context.Background()); err != nil {
+			stdlog.Fatal(err)
+		}
+	}()
+
+	// shutdown := newStdoutExporterTracerProvider()
+	// defer shutdown()
 
 	// ctx := context.Background()
 	// shutdown, err := newTraceProvider(ctx)
@@ -117,6 +127,8 @@ func newStdoutExporterTracerProvider() func() {
 //
 // 	// Register the Trace Exporter with a TracerProvider, using a batch
 // 	// span processor to aggregate spans before export.
+// 	// For the demonstration, use sdktrace.AlwaysSample sampler to sample all traces.
+// 	// In a production application, use sdktrace.ProbabilitySampler with a desired probability.
 // 	tracerProvider := trace.NewTracerProvider(
 // 		trace.WithSampler(trace.AlwaysSample()),
 // 		trace.WithResource(res),

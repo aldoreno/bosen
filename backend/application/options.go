@@ -8,7 +8,7 @@ import (
 // NOTE: logger should be configured the earliest
 func WithLogger(logger sglog.Logger) Option {
 	return func(a *Application) {
-		a.log = logger.Scoped("application", "main application")
+		a.log = logger.Scoped("application")
 	}
 }
 

@@ -8,7 +8,7 @@ var logger sglog.Logger
 
 func ProvideLogger() sglog.Logger {
 	if logger == nil {
-		logger = sglog.Scoped("", "root logger")
+		logger = sglog.Scoped("global")
 	}
 
 	return logger

@@ -12,7 +12,7 @@ type DummyLogger struct {
 	*zap.Logger
 }
 
-func (z *DummyLogger) Scoped(scope string, description string) sglog.Logger {
+func (z *DummyLogger) Scoped(scope string) sglog.Logger {
 	return &DummyLogger{}
 }
 
