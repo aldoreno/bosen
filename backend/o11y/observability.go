@@ -1,4 +1,4 @@
-package observability
+package o11y
 
 import (
 	"bosen/manifest"

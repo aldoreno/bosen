@@ -4,7 +4,7 @@ import (
 	"bosen/application"
 	"bosen/log"
 	"bosen/manifest"
-	"bosen/observability"
+	"bosen/o11y"
 	"context"
 
 	// "fmt"
@@ -35,7 +35,7 @@ func main() {
 	log := sglog.Scoped("main")
 	log.Warn("application starting", sglog.Time("now", time.Now()))
 
-	tracerProvider, _ := observability.InitTracerProvider()
+	tracerProvider, _ := o11y.InitTracerProvider()
 	defer func() {
 		if err := tracerProvider.Shutdown(context.Background()); err != nil {
 			stdlog.Fatal(err)
